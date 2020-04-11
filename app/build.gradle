@@ -1,0 +1,16 @@
+apply from: "$rootDir/gradle/scripts/spring-module.gradle"
+apply plugin: 'org.springframework.boot'
+
+bootJar {
+    enabled = true
+}
+
+dependencies {
+    implementation library.jacksonKotlin
+
+    runtime library.postgres
+}
+
+springBoot {
+    mainClassName = 'ru.flowernetes.AppKt'
+}

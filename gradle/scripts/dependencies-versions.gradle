@@ -1,0 +1,11 @@
+ext {
+    spring_version = "2.2.6.RELEASE"
+    postgresql_version = "42.2.12"
+    swagger_version = "2.9.2"
+    jacksonKotlin_version = "2.10.2"
+
+    mockito_version = '3.3.3'
+    mockitoKotlin_version = '2.2.0'
+    junit_version = "5.6.2"
+    googleTruth_version = "1.0"
+}
