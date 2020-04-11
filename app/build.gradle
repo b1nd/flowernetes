@@ -6,6 +6,8 @@ bootJar {
 }
 
 dependencies {
+    implementation library.swagger
+
     implementation library.jacksonKotlin
 
     runtime library.postgres

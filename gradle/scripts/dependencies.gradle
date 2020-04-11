@@ -17,6 +17,8 @@ ext {
             kotlinTest             : ("org.jetbrains.kotlin:kotlin-test:$kotlin_version"),
             googleTruth            : ("com.google.truth:truth:$googleTruth_version"),
             postgres               : ("org.postgresql:postgresql:$postgresql_version"),
+
+            swagger                : project(":swagger"),
     ]
     groups = [
             forTest: [
