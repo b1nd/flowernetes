@@ -1,4 +1,8 @@
 rootProject.name = 'flowernetes'
 
 include 'app'
+include 'entity'
+include 'util'
+include 'auth'
+include 'auth_api'
 include 'swagger'

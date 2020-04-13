@@ -1,5 +1,6 @@
 ext {
     spring_version = "2.2.6.RELEASE"
+    jjwt_version = "0.11.1"
     postgresql_version = "42.2.12"
     swagger_version = "2.9.2"
     jacksonKotlin_version = "2.10.2"

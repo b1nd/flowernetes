@@ -6,6 +6,10 @@ bootJar {
 }
 
 dependencies {
+    implementation library.entity
+    implementation library.util
+    implementation library.auth_api
+    implementation library.auth
     implementation library.swagger
 
     implementation library.jacksonKotlin

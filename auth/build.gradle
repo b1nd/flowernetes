@@ -1,0 +1,13 @@
+apply from: "$rootDir/gradle/scripts/spring-module.gradle"
+
+dependencies {
+    implementation library.auth_api
+    implementation library.util
+
+    implementation library.springSecurity
+    implementation library.jjwtApi
+    runtime library.jjwtImpl
+    runtime library.jjwtJackson
+
+    testImplementation groups.forTest
+}

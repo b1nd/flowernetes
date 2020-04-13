@@ -14,7 +14,7 @@ def getCurrentGitBranch() {
 def getJarVersion() {
     def gitCommitHash = 'git rev-parse --verify --short HEAD'.execute().text.trim()
 
-    switch(getCurrentGitBranch()) {
+    switch (getCurrentGitBranch()) {
         case ~/(master)|(release.*)/:
             return version
         default:
