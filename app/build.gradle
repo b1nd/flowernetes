@@ -8,6 +8,10 @@ bootJar {
 dependencies {
     implementation library.entity
     implementation library.util
+    implementation library.orchestration_api
+    implementation library.orchestration
+    implementation library.team_api
+    implementation library.team
     implementation library.auth_api
     implementation library.auth
     implementation library.swagger
