@@ -12,6 +12,8 @@ dependencies {
     implementation library.orchestration
     implementation library.team_api
     implementation library.team
+    implementation library.workflow_api
+    implementation library.workflow
     implementation library.auth_api
     implementation library.auth
     implementation library.swagger

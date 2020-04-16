@@ -30,6 +30,8 @@ ext {
             orchestration_api: project(":orchestration_api"),
             team             : project(":team"),
             team_api         : project(":team_api"),
+            workflow         : project(":workflow"),
+            workflow_api     : project(":workflow_api"),
             swagger          : project(":swagger")
     ]
     groups = [
