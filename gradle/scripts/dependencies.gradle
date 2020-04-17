@@ -7,6 +7,7 @@ ext {
             springWeb        : ("org.springframework.boot:spring-boot-starter-web:$spring_version"),
             springSecurity   : ("org.springframework.boot:spring-boot-starter-security:$spring_version"),
             springData       : ("org.springframework.boot:spring-boot-starter-data-jpa:$spring_version"),
+            springMongo      : ("org.springframework.boot:spring-boot-starter-data-mongodb:$spring_version"),
             jjwtApi          : ("io.jsonwebtoken:jjwt-api:$jjwt_version"),
             jjwtImpl         : ("io.jsonwebtoken:jjwt-impl:$jjwt_version"),
             jjwtJackson      : ("io.jsonwebtoken:jjwt-jackson:$jjwt_version"),
@@ -24,6 +25,7 @@ ext {
 
             entity           : project(":entity"),
             util             : project(":util"),
+            pagination_api   : project(":pagination_api"),
             auth             : project(":auth"),
             auth_api         : project(":auth_api"),
             orchestration    : project(":orchestration"),
@@ -32,6 +34,8 @@ ext {
             team_api         : project(":team_api"),
             workflow         : project(":workflow"),
             workflow_api     : project(":workflow_api"),
+            script           : project(":script"),
+            script_api       : project(":script_api"),
             swagger          : project(":swagger")
     ]
     groups = [

@@ -10,6 +10,8 @@ dependencies {
     implementation library.util
     implementation library.orchestration_api
     implementation library.orchestration
+    implementation library.script_api
+    implementation library.script
     implementation library.team_api
     implementation library.team
     implementation library.workflow_api

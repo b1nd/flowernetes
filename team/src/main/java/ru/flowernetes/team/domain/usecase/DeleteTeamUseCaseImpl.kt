@@ -16,6 +16,7 @@ class DeleteTeamUseCaseImpl(
     override fun exec(teamId: Long) {
         roleChecker.requireAll(SystemUserRole.ADMIN)
 
+        // todo: check if there are no dependencies on this team
         teamRepository.deleteById(teamId)
     }
 }

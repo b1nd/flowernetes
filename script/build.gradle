@@ -2,8 +2,13 @@ apply from: "$rootDir/gradle/scripts/spring-module.gradle"
 
 dependencies {
     implementation library.entity
+    implementation library.util
+    implementation library.script_api
+    implementation library.team_api
     implementation library.auth_api
     implementation library.pagination_api
+
+    implementation library.springMongo
 
     testImplementation groups.forTest
 }
