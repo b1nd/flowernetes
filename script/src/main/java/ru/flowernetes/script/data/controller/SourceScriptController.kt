@@ -13,10 +13,7 @@ import ru.flowernetes.pagination.api.domain.entity.PageRequest
 import ru.flowernetes.pagination.api.domain.entity.Sort
 import ru.flowernetes.script.api.domain.dto.FileDto
 import ru.flowernetes.script.api.domain.dto.SourceScriptDto
-import ru.flowernetes.script.api.domain.usecase.AddSourceScriptUseCase
-import ru.flowernetes.script.api.domain.usecase.DeleteSourceScriptUseCase
-import ru.flowernetes.script.api.domain.usecase.GetSourceScriptByIdUseCase
-import ru.flowernetes.script.api.domain.usecase.GetSourceScriptsUseCase
+import ru.flowernetes.script.api.domain.usecase.*
 
 
 @RestController
@@ -24,6 +21,8 @@ import ru.flowernetes.script.api.domain.usecase.GetSourceScriptsUseCase
 class SourceScriptController(
   private val addSourceScriptUseCase: AddSourceScriptUseCase,
   private val getSourceScriptsUseCase: GetSourceScriptsUseCase,
+  private val getAllCallingTeamSourceScriptsUseCase: GetAllCallingTeamSourceScriptsUseCase,
+  private val getSourceScriptFileDtoByIdUseCase: GetSourceScriptFileDtoByIdUseCase,
   private val getSourceScriptByIdUseCase: GetSourceScriptByIdUseCase,
   private val deleteSourceScriptUseCase: DeleteSourceScriptUseCase
 ) {
@@ -39,6 +38,11 @@ class SourceScriptController(
         )
     }
 
+    @GetMapping("/session")
+    fun getAllTeamSourceScripts(): List<SourceScript> {
+        return getAllCallingTeamSourceScriptsUseCase.exec()
+    }
+
     @GetMapping
     fun getSourceScriptsPage(
       @RequestParam page: Int,
@@ -50,8 +54,13 @@ class SourceScriptController(
     }
 
     @GetMapping("/{id}")
-    fun getSourceScript(@PathVariable id: String): ResponseEntity<InputStreamResource> {
-        val fileDto = getSourceScriptByIdUseCase.exec(id)
+    fun getSourceScript(@PathVariable id: String): SourceScript {
+        return getSourceScriptByIdUseCase.exec(id)
+    }
+
+    @GetMapping("/{id}/file")
+    fun getSourceScriptFile(@PathVariable id: String): ResponseEntity<InputStreamResource> {
+        val fileDto = getSourceScriptFileDtoByIdUseCase.exec(id)
         val resource = InputStreamResource(fileDto.inputStream)
         val contentType = fileDto.contentType ?: MediaType.APPLICATION_OCTET_STREAM_VALUE
 
