@@ -18,6 +18,8 @@ dependencies {
     implementation library.team
     implementation library.workflow_api
     implementation library.workflow
+    implementation library.task_api
+    implementation library.task
     implementation library.auth_api
     implementation library.auth
     implementation library.swagger
