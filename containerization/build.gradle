@@ -1,0 +1,10 @@
+apply from: "$rootDir/gradle/scripts/spring-module.gradle"
+
+dependencies {
+    implementation library.entity
+    implementation library.containerization_api
+
+    implementation library.dockerClient
+
+    testImplementation groups.forTest
+}

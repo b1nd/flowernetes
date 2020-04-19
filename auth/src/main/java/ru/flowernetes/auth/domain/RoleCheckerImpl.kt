@@ -7,7 +7,7 @@ import ru.flowernetes.auth.api.domain.usecase.CheckCallerHasSystemRoleUseCase
 import ru.flowernetes.entity.auth.SystemUserRole
 
 @Component
-open class RoleCheckerImpl(
+class RoleCheckerImpl(
   private val checkCallerHasSystemRoleUseCase: CheckCallerHasSystemRoleUseCase
 ) : RoleChecker {
 
