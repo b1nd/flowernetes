@@ -8,5 +8,9 @@ data class TaskDto(
   val workflow: Workflow,
   val condition: Condition,
   val baseImage: String,
+  val memoryRequest: String,
+  val memoryLimit: String,
+  val cpuRequest: String,
+  val cpuLimit: String,
   val sourceScriptId: String
 )

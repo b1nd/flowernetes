@@ -13,5 +13,9 @@ data class Task(
   val workflow: Workflow,
   val conditionJson: String,
   val baseImage: String,
+  val memoryRequest: Long,
+  val memoryLimit: Long,
+  val cpuRequest: Double,
+  val cpuLimit: Double,
   val sourceScriptId: String
 )
