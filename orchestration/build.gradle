@@ -3,8 +3,11 @@ apply from: "$rootDir/gradle/scripts/spring-module.gradle"
 dependencies {
     implementation library.entity
     implementation library.orchestration_api
+    implementation library.containerization_api
     implementation library.util
+
     implementation library.kubernetesClient
+    implementation library.commonsCodec
 
     testImplementation groups.forTest
 }

@@ -5,6 +5,10 @@ import io.fabric8.kubernetes.client.KubernetesClient
 import org.springframework.stereotype.Component
 import ru.flowernetes.entity.orchestration.ResourceQuota
 import ru.flowernetes.orchestration.api.domain.usecase.GetNamespaceResourceQuotaUseCase
+import ru.flowernetes.orchestration.CPU_LIMITS
+import ru.flowernetes.orchestration.CPU_REQUESTS
+import ru.flowernetes.orchestration.MEMORY_LIMITS
+import ru.flowernetes.orchestration.MEMORY_REQUESTS
 
 @Component
 class GetNamespaceResourceQuotaUseCaseImpl(
@@ -22,16 +26,16 @@ class GetNamespaceResourceQuotaUseCaseImpl(
 
         resourceQuotas.forEach {
             when (it.key) {
-                "requests.cpu" -> resourceQuota = resourceQuota.copy(
+                CPU_REQUESTS -> resourceQuota = resourceQuota.copy(
                   cpuRequest = getDoubleFromQuantity(it.value)
                 )
-                "limits.cpu" -> resourceQuota = resourceQuota.copy(
+                CPU_LIMITS -> resourceQuota = resourceQuota.copy(
                   cpuLimit = getDoubleFromQuantity(it.value)
                 )
-                "requests.memory" -> resourceQuota = resourceQuota.copy(
+                MEMORY_REQUESTS -> resourceQuota = resourceQuota.copy(
                   memoryRequest = getLongFromQuantity(it.value)
                 )
-                "limits.memory" -> resourceQuota = resourceQuota.copy(
+                MEMORY_LIMITS -> resourceQuota = resourceQuota.copy(
                   memoryLimit = getLongFromQuantity(it.value)
                 )
             }

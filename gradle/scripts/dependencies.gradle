@@ -8,6 +8,8 @@ ext {
             springSecurity      : ("org.springframework.boot:spring-boot-starter-security:$spring_version"),
             springData          : ("org.springframework.boot:spring-boot-starter-data-jpa:$spring_version"),
             springMongo         : ("org.springframework.boot:spring-boot-starter-data-mongodb:$spring_version"),
+            commonsCodec        : ("commons-codec:commons-codec:$commonsCodec_version"),
+            commonsIO           : ("commons-io:commons-io:$commonsIO_version"),
             jjwtApi             : ("io.jsonwebtoken:jjwt-api:$jjwt_version"),
             jjwtImpl            : ("io.jsonwebtoken:jjwt-impl:$jjwt_version"),
             jjwtJackson         : ("io.jsonwebtoken:jjwt-jackson:$jjwt_version"),

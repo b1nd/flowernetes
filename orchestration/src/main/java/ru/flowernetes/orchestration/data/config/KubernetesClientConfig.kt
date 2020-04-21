@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 open class KubernetesClientConfig(
-  @Value("\${app.kubernetesApiUrl}")
+  @Value("\${kubernetes.host}")
   val masterUrl: String
 ) {
 

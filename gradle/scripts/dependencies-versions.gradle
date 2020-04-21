@@ -1,5 +1,7 @@
 ext {
     spring_version = "2.2.6.RELEASE"
+    commonsCodec_version = "1.14"
+    commonsIO_version = "2.6"
     jjwt_version = "0.11.1"
     kubernetesClient_version = "4.9.0"
     dockerClient_version = "3.2.1"

@@ -9,6 +9,7 @@ dependencies {
     implementation library.pagination_api
 
     implementation library.springMongo
+    implementation library.commonsIO
 
     testImplementation groups.forTest
 }
