@@ -19,6 +19,7 @@ class TaskDtoMapper(
           name = it.name,
           workflow = it.workflow,
           conditionJson = objectMapper.writeValueAsString(it.condition),
+          scheduled = it.scheduled,
           baseImage = it.baseImage,
           cpuRequest = cpuQuantityParser.parse(it.cpuRequest),
           memoryRequest = memoryQuantityParser.parse(it.memoryRequest),

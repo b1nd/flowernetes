@@ -6,31 +6,41 @@ import io.fabric8.kubernetes.client.KubernetesClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
 import ru.flowernetes.containerization.api.domain.usecase.GetTaskImageOrCreateUseCase
 import ru.flowernetes.entity.task.Task
+import ru.flowernetes.entity.task.TaskStatus
+import ru.flowernetes.entity.workload.Workload
 import ru.flowernetes.orchestration.CPU_RESOURCE
 import ru.flowernetes.orchestration.MEMORY_RESOURCE
+import ru.flowernetes.orchestration.api.domain.entity.JobLabelKeys
 import ru.flowernetes.orchestration.api.domain.usecase.RunTaskUseCase
 import ru.flowernetes.orchestration.data.provider.TaskJobNameProvider
+import ru.flowernetes.workload.api.domain.model.WorkloadModel
+import ru.flowernetes.workload.api.domain.usecase.AddWorkloadUseCase
 
 @Component
-class RunTaskUseCaseImpl(
+open class RunTaskUseCaseImpl(
   private val getTaskImageOrCreateUseCase: GetTaskImageOrCreateUseCase,
   private val taskJobNameProvider: TaskJobNameProvider,
   private val kubernetesClient: KubernetesClient,
+  private val addWorkloadUseCase: AddWorkloadUseCase,
   @Value("\${kubernetes.api.version}")
   private val kubernetesApiVersion: String
 ) : RunTaskUseCase {
 
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
 
-    override fun exec(task: Task) {
+    @Async
+    override fun execAsync(task: Task) {
         log.info("Running $task")
+        val jobName = taskJobNameProvider.get(task)
+
+        val workload = addNewWorkload(task, jobName)
 
         val image = getTaskImageOrCreateUseCase.exec(task)
         val namespace = task.workflow.team.namespace
-        val jobName = taskJobNameProvider.get(task)
 
         checkJobNameNotExists(namespace, jobName)
 
@@ -38,8 +48,11 @@ class RunTaskUseCaseImpl(
           .withApiVersion("batch/$kubernetesApiVersion")
           .withNewMetadata()
             .withName(jobName)
+            .withLabels(mapOf(
+              Pair(JobLabelKeys.WORKLOAD_ID.name, workload.id.toString())))
           .endMetadata()
           .withNewSpec()
+            .withBackoffLimit(0)
             .withNewTemplate()
               .withNewSpec()
                 .withRestartPolicy("Never")
@@ -71,5 +84,19 @@ class RunTaskUseCaseImpl(
         kubernetesClient.batch().jobs().inNamespace(namespace).withName(jobName).get()?.let {
             throw IllegalStateException("Job with name $jobName already exists")
         }
+    }
+
+    private fun addNewWorkload(task: Task, jobName: String): Workload {
+        return addWorkloadUseCase.exec(WorkloadModel(
+          task = task,
+          taskStatus = TaskStatus.PENDING,
+          jobName = jobName,
+          baseImage = task.baseImage,
+          memoryRequest = task.memoryRequest,
+          memoryLimit = task.memoryLimit,
+          cpuRequest = task.cpuRequest,
+          cpuLimit = task.cpuLimit,
+          sourceScriptId = task.sourceScriptId
+        ))
     }
 }

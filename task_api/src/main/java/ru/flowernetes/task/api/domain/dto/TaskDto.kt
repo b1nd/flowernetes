@@ -7,6 +7,7 @@ data class TaskDto(
   val name: String,
   val workflow: Workflow,
   val condition: Condition,
+  val scheduled: Boolean,
   val baseImage: String,
   val memoryRequest: String,
   val memoryLimit: String,

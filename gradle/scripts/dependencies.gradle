@@ -41,6 +41,8 @@ ext {
             workflow_api        : project(":workflow_api"),
             task                : project(":task"),
             task_api            : project(":task_api"),
+            workload            : project(":workload"),
+            workload_api        : project(":workload_api"),
             script              : project(":script"),
             script_api          : project(":script_api"),
             swagger             : project(":swagger")

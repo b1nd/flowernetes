@@ -2,6 +2,7 @@ apply from: "$rootDir/gradle/scripts/spring-module.gradle"
 
 dependencies {
     implementation library.entity
+    implementation library.workload_api
     implementation library.orchestration_api
     implementation library.containerization_api
     implementation library.util

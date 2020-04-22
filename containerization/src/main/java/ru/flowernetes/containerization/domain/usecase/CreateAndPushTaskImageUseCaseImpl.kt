@@ -1,10 +1,8 @@
 package ru.flowernetes.containerization.domain.usecase
 
 import com.github.dockerjava.api.DockerClient
-import com.github.dockerjava.api.async.ResultCallbackTemplate
 import com.github.dockerjava.api.command.BuildImageResultCallback
 import com.github.dockerjava.api.model.Identifier
-import com.github.dockerjava.api.model.PushResponseItem
 import com.github.dockerjava.api.model.Repository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -45,15 +43,11 @@ class CreateAndPushTaskImageUseCaseImpl(
 
         dockerClient
           .pushImageCmd(Identifier(Repository(imageName.nameWithRepository), imageName.tag))
-          .exec(PushImageResultCallback())
+          .start()
           .awaitCompletion()
 
         log.info("Image pushed ${imageName.fullName}")
 
         return imageName.fullName
-    }
-
-    private class PushImageResultCallback : ResultCallbackTemplate<PushImageResultCallback, PushResponseItem>() {
-        override fun onNext(item: PushResponseItem?) {}
     }
 }

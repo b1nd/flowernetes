@@ -1,0 +1,8 @@
+apply from: "$rootDir/gradle/scripts/module.gradle"
+
+dependencies {
+    implementation library.entity
+    implementation library.pagination_api
+
+    testImplementation groups.forTest
+}

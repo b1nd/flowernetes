@@ -13,7 +13,7 @@ class TaskImageNameProviderImpl(
 ) : TaskImageNameProvider {
 
     override fun get(task: Task): ImageName {
-        val name = DigestUtils.sha256Hex(
+        val name = DigestUtils.sha1Hex(
           task.baseImage +
             task.sourceScriptId
         )
