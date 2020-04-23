@@ -15,7 +15,7 @@ class GetBaseImageNamesUseCaseImpl(
     override fun exec(): List<String> {
         return dockerClient
           .listImagesCmd().exec()
-          .filterNot { image -> image.repoTags.isEmpty() || image.repoTags.any { it.startsWith(dockerRegistry) } }
+          .filterNot { image -> image.repoTags == null || image.repoTags.isEmpty() || image.repoTags.any { it.startsWith(dockerRegistry) } }
           .map { it.repoTags[0] }
     }
 }

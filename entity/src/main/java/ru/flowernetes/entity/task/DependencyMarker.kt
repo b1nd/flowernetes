@@ -11,6 +11,8 @@ data class DependencyMarker(
   @Id @GeneratedValue
   val id: Long = NOT_DEFINED_ID,
   @ManyToOne
+  val task: Task,
+  @ManyToOne
   val dependencyTask: Task,
   val marker: Boolean
 )

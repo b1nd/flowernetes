@@ -6,4 +6,5 @@ import ru.flowernetes.entity.workflow.Workflow
 
 interface TaskRepository : JpaRepository<Task, Long> {
     fun findAllByWorkflow(workflow: Workflow): List<Task>
+    fun findAllByScheduledIsTrue(): List<Task>
 }

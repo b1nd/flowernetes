@@ -6,14 +6,14 @@ import ru.flowernetes.task.api.domain.entity.NoSuchTaskException
 import ru.flowernetes.task.api.domain.usecase.CheckThereAreNoDependenciesOnTaskUseCase
 import ru.flowernetes.task.api.domain.usecase.DeleteTaskByIdUseCase
 import ru.flowernetes.task.data.repo.DependencyMarkerRepository
-import ru.flowernetes.task.data.repo.TaskDependenciesRepository
 import ru.flowernetes.task.data.repo.TaskRepository
+import ru.flowernetes.workload.api.domain.usecase.DeleteWorkloadsByTaskUseCase
 
 @Component
 class DeleteTaskByIdUseCaseImpl(
   private val taskRepository: TaskRepository,
-  private val taskDependenciesRepository: TaskDependenciesRepository,
   private val dependencyMarkerRepository: DependencyMarkerRepository,
+  private val deleteWorkloadsByTaskUseCase: DeleteWorkloadsByTaskUseCase,
   private val checkThereAreNoDependenciesOnTaskUseCase: CheckThereAreNoDependenciesOnTaskUseCase
 ) : DeleteTaskByIdUseCase {
 
@@ -22,10 +22,10 @@ class DeleteTaskByIdUseCaseImpl(
 
         checkThereAreNoDependenciesOnTaskUseCase.exec(task)
 
-        val taskDependencies = taskDependenciesRepository.findByTask(task)
-        val dependencyMarkersIds = taskDependencies.dependencyMarkers.map { it.id }
-        taskDependenciesRepository.delete(taskDependencies)
-        dependencyMarkersIds.forEach(dependencyMarkerRepository::deleteById)
+        dependencyMarkerRepository.deleteAll(dependencyMarkerRepository.findAllByTask(task))
+
+        deleteWorkloadsByTaskUseCase.exec(task)
+
         taskRepository.deleteById(id)
     }
 }

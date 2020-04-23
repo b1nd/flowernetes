@@ -4,21 +4,18 @@ import org.springframework.stereotype.Component
 import ru.flowernetes.entity.task.Task
 import ru.flowernetes.task.api.domain.entity.CannotDeleteDependentTask
 import ru.flowernetes.task.api.domain.usecase.CheckThereAreNoDependenciesOnTaskUseCase
-import ru.flowernetes.task.data.repo.TaskDependenciesRepository
+import ru.flowernetes.task.data.repo.DependencyMarkerRepository
 
 @Component
 class CheckThereAreNoDependenciesOnTaskUseCaseImpl(
-  private val taskDependenciesRepository: TaskDependenciesRepository
+  private val dependencyMarkerRepository: DependencyMarkerRepository
 ) : CheckThereAreNoDependenciesOnTaskUseCase {
 
     override fun exec(task: Task) {
-        val dependentTasks = taskDependenciesRepository.findAll()
-          .flatMap { dependencies -> dependencies.dependencyMarkers.map { Pair(dependencies, it.dependencyTask) } }
-          .filter { it.second == task }
-          .map { it.second }
+        val dependentMarkers = dependencyMarkerRepository.findAllByDependencyTask(task)
 
-        if (dependentTasks.isNotEmpty()) {
-            throw CannotDeleteDependentTask(task, dependentTasks)
+        if (dependentMarkers.isNotEmpty()) {
+            throw CannotDeleteDependentTask(task, dependentMarkers.map { it.task })
         }
     }
 }

@@ -3,6 +3,7 @@ package ru.flowernetes.task.domain.usecase
 import org.springframework.stereotype.Component
 import ru.flowernetes.auth.api.domain.entity.NotAllowedException
 import ru.flowernetes.entity.task.Task
+import ru.flowernetes.scheduling.api.domain.usecase.ScheduleTaskUseCase
 import ru.flowernetes.task.api.domain.dto.TaskDto
 import ru.flowernetes.task.api.domain.usecase.AddTaskDependenciesFromConditionUseCase
 import ru.flowernetes.task.api.domain.usecase.AddTaskUseCase
@@ -15,6 +16,7 @@ class AddTaskUseCaseImpl(
   private val getCallingUserTeamUseCase: GetCallingUserTeamUseCase,
   private val taskRepository: TaskRepository,
   private val addTaskDependenciesFromConditionUseCase: AddTaskDependenciesFromConditionUseCase,
+  private val scheduleTaskUseCase: ScheduleTaskUseCase,
   private val taskDtoMapper: TaskDtoMapper
 ) : AddTaskUseCase {
 
@@ -26,6 +28,8 @@ class AddTaskUseCaseImpl(
         val task = taskRepository.save(taskDtoMapper.map(taskDto))
 
         addTaskDependenciesFromConditionUseCase.exec(task, taskDto.condition)
+
+        if (task.scheduled) scheduleTaskUseCase.exec(task)
 
         return task
     }

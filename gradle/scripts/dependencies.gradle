@@ -35,6 +35,8 @@ ext {
             orchestration_api   : project(":orchestration_api"),
             containerization    : project(":containerization"),
             containerization_api: project(":containerization_api"),
+            scheduling          : project(":scheduling"),
+            scheduling_api      : project(":scheduling_api"),
             team                : project(":team"),
             team_api            : project(":team_api"),
             workflow            : project(":workflow"),

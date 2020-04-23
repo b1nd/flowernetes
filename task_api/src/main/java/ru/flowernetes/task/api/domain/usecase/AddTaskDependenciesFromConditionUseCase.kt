@@ -1,9 +1,9 @@
 package ru.flowernetes.task.api.domain.usecase
 
 import ru.flowernetes.entity.task.Condition
+import ru.flowernetes.entity.task.DependencyMarker
 import ru.flowernetes.entity.task.Task
-import ru.flowernetes.entity.task.TaskDependencies
 
 interface AddTaskDependenciesFromConditionUseCase {
-    fun exec(task: Task, condition: Condition): TaskDependencies
+    fun exec(task: Task, condition: Condition): List<DependencyMarker>
 }

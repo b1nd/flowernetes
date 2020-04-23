@@ -6,4 +6,6 @@ import ru.flowernetes.entity.task.Task
 
 interface DependencyMarkerRepository : JpaRepository<DependencyMarker, Long> {
     fun findAllByDependencyTask(dependencyTask: Task): List<DependencyMarker>
+    fun findAllByDependencyTaskAndTask_ScheduledIsTrue(dependencyTask: Task): List<DependencyMarker>
+    fun findAllByTask(task: Task): List<DependencyMarker>
 }
