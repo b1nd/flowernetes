@@ -18,7 +18,7 @@ class TaskDtoMapper(
         return Task(
           name = it.name,
           workflow = it.workflow,
-          conditionJson = objectMapper.writeValueAsString(it.condition),
+          conditionsJson = objectMapper.writeValueAsString(it.conditions),
           scheduled = it.scheduled,
           baseImage = it.baseImage,
           cpuRequest = cpuQuantityParser.parse(it.cpuRequest),

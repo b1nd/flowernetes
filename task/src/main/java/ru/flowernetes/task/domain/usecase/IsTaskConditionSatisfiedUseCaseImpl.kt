@@ -13,23 +13,27 @@ class IsTaskConditionSatisfiedUseCaseImpl(
 ) : IsTaskConditionSatisfiedUseCase {
 
     override fun exec(task: Task): Boolean {
-        val dependencyMarkers = dependencyMarkerRepository.findAllByTask(task)
-        val condition = objectMapper.readValue(task.conditionJson, Condition::class.java)
-        return isConditionSatisfied(condition, dependencyMarkers)
+        val conditions = objectMapper.readValue(task.conditionsJson, Conditions::class.java)
+
+        val logicCondition = conditions.logicCondition?.let {
+            val dependencyMarkers = dependencyMarkerRepository.findAllByTask(task)
+            isLogicConditionSatisfied(it, dependencyMarkers)
+        }
+
+        return logicCondition ?: false
     }
 
-    private fun isConditionSatisfied(
-      condition: Condition,
+    private fun isLogicConditionSatisfied(
+      logicCondition: LogicCondition,
       dependencyMarkers: List<DependencyMarker>
-    ): Boolean = when (condition) {
-        is TimeCondition -> false
+    ): Boolean = when (logicCondition) {
         is TaskCondition -> dependencyMarkers
-          .find { it.dependencyTask.id == condition.taskId }?.marker ?: false
-        is AndCondition -> condition.conditions
-          .map { isConditionSatisfied(it, dependencyMarkers) }
+          .find { it.dependencyTask.id == logicCondition.taskId }?.marker ?: false
+        is AndCondition -> logicCondition.logicConditions
+          .map { isLogicConditionSatisfied(it, dependencyMarkers) }
           .fold(true, { acc, next -> acc && next })
-        is OrCondition -> condition.conditions
-          .map { isConditionSatisfied(it, dependencyMarkers) }
+        is OrCondition -> logicCondition.logicConditions
+          .map { isLogicConditionSatisfied(it, dependencyMarkers) }
           .fold(false, { acc, next -> acc || next })
     }
 }

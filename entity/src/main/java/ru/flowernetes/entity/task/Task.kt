@@ -11,7 +11,8 @@ data class Task(
   val name: String,
   @ManyToOne
   val workflow: Workflow,
-  val conditionJson: String,
+  @Column(columnDefinition = "TEXT")
+  val conditionsJson: String,
   val scheduled: Boolean,
   val baseImage: String,
   val memoryRequest: Long,

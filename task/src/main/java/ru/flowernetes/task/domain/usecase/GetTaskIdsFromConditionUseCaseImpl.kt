@@ -6,10 +6,9 @@ import ru.flowernetes.task.api.domain.usecase.GetTaskIdsFromConditionUseCase
 
 @Component
 class GetTaskIdsFromConditionUseCaseImpl : GetTaskIdsFromConditionUseCase {
-    override fun exec(condition: Condition): List<Long> = when (condition) {
-        is TimeCondition -> listOf()
-        is TaskCondition -> listOf(condition.taskId)
-        is AndCondition -> condition.conditions.flatMap(::exec)
-        is OrCondition -> condition.conditions.flatMap(::exec)
+    override fun exec(logicCondition: LogicCondition): List<Long> = when (logicCondition) {
+        is TaskCondition -> listOf(logicCondition.taskId)
+        is AndCondition -> logicCondition.logicConditions.flatMap(::exec)
+        is OrCondition -> logicCondition.logicConditions.flatMap(::exec)
     }
 }

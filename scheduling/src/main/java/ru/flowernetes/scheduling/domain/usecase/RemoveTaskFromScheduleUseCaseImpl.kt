@@ -2,9 +2,8 @@ package ru.flowernetes.scheduling.domain.usecase
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.stereotype.Component
-import ru.flowernetes.entity.task.Condition
+import ru.flowernetes.entity.task.Conditions
 import ru.flowernetes.entity.task.Task
-import ru.flowernetes.entity.task.TimeCondition
 import ru.flowernetes.scheduling.api.domain.usecase.RemoveCronScheduleUseCase
 import ru.flowernetes.scheduling.api.domain.usecase.RemoveTaskFromScheduleUseCase
 
@@ -15,8 +14,9 @@ class RemoveTaskFromScheduleUseCaseImpl(
 ) : RemoveTaskFromScheduleUseCase {
 
     override fun exec(task: Task) {
-        when (objectMapper.readValue(task.conditionJson, Condition::class.java)) {
-            is TimeCondition -> removeCronScheduleUseCase.exec(task)
+        val conditions = objectMapper.readValue(task.conditionsJson, Conditions::class.java)
+        conditions.timeCondition?.let {
+            removeCronScheduleUseCase.exec(task)
         }
     }
 }
