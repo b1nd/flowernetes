@@ -19,5 +19,7 @@ data class Task(
   val memoryLimit: Long,
   val cpuRequest: Double,
   val cpuLimit: Double,
+  val saveLog: Boolean,
+  val saveScript: Boolean,
   val sourceScriptId: String
 )

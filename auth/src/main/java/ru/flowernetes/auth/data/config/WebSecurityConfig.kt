@@ -2,6 +2,7 @@ package ru.flowernetes.auth.data.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.BeanIds
@@ -63,6 +64,9 @@ open class WebSecurityConfig(
             allowedOrigins = listOf(CorsConfiguration.ALL)
             allowedHeaders = listOf(CorsConfiguration.ALL)
             maxAge = 1800L
+
+            allowedHeaders = listOf(CorsConfiguration.ALL)
+            exposedHeaders = listOf(HttpHeaders.CONTENT_DISPOSITION)
 
             allowedMethods = listOf(
               HttpMethod.DELETE.name,

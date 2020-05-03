@@ -4,7 +4,7 @@ import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.gridfs.GridFsTemplate
 import org.springframework.stereotype.Component
-import ru.flowernetes.script.api.domain.dto.FileDto
+import ru.flowernetes.entity.file.FileDto
 import ru.flowernetes.script.api.domain.usecase.GetSourceScriptFileDtoByIdUseCase
 
 @Component

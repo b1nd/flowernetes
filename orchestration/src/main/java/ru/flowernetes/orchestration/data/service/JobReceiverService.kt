@@ -10,17 +10,22 @@ import org.springframework.stereotype.Service
 import ru.flowernetes.entity.task.TaskStatus
 import ru.flowernetes.orchestration.api.domain.entity.JobLabelKeys
 import ru.flowernetes.orchestration.api.domain.entity.NoSuchJobLabelException
+import ru.flowernetes.orchestration.api.domain.usecase.SaveLogAndDataFromLogReaderUseCase
+import ru.flowernetes.orchestration.api.domain.usecase.SaveLogFromLogReaderUseCase
 import ru.flowernetes.orchestration.data.dto.JobStatus
 import ru.flowernetes.orchestration.data.dto.JobStatusType
 import ru.flowernetes.orchestration.data.parser.JobTimeParser
 import ru.flowernetes.workload.api.domain.usecase.GetWorkloadByIdUseCase
 import ru.flowernetes.workload.api.domain.usecase.UpdateWorkloadUseCase
+import java.io.Reader
 
 @Service
 open class JobReceiverService(
   private val kubernetesClient: KubernetesClient,
   private val updateWorkloadUseCase: UpdateWorkloadUseCase,
   private val getWorkloadByIdUseCase: GetWorkloadByIdUseCase,
+  private val saveLogAndDataFromLogReaderUseCase: SaveLogAndDataFromLogReaderUseCase,
+  private val saveLogFromLogReaderUseCase: SaveLogFromLogReaderUseCase,
   private val jobTimeParser: JobTimeParser
 ) {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
@@ -55,6 +60,8 @@ open class JobReceiverService(
                     null -> {
                         job.status.conditions.forEach {
                             if (it.type == JobStatusType.Complete.name && it.status == JobStatus.True.name) {
+                                saveLogAndDataFromLogReaderUseCase.exec(workload, job.reader())
+
                                 updateWorkloadUseCase.exec(workload.copy(
                                   taskStartTime = job.status.startTime?.let(jobTimeParser::parse),
                                   taskCompletionTime = job.status.completionTime?.let(jobTimeParser::parse),
@@ -65,6 +72,8 @@ open class JobReceiverService(
                                 return
                             }
                             if (it.type == JobStatusType.Failed.name && it.status == JobStatus.True.name) {
+                                saveLogFromLogReaderUseCase.exec(workload, job.reader())
+
                                 updateWorkloadUseCase.exec(workload.copy(
                                   taskStartTime = job.status.startTime?.let(jobTimeParser::parse),
                                   taskCompletionTime = it.lastTransitionTime?.let(jobTimeParser::parse),
@@ -92,7 +101,14 @@ open class JobReceiverService(
     }
 
     private fun Job.getLabel(jobLabelKey: JobLabelKeys): String {
-        return this.metadata.labels[jobLabelKey.name] ?: throw NoSuchJobLabelException(this.toString(), jobLabelKey)
+        return metadata.labels[jobLabelKey.name] ?: throw NoSuchJobLabelException(toString(), jobLabelKey)
+    }
+
+    private fun Job.reader(): Reader {
+        return kubernetesClient.batch().jobs()
+          .inNamespace(metadata.namespace)
+          .withName(metadata.name)
+          .logReader
     }
 
     private fun checkJobHasRequiredLabels(job: Job): Boolean {

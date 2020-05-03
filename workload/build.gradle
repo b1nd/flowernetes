@@ -8,5 +8,7 @@ dependencies {
     implementation library.auth_api
     implementation library.pagination_api
 
+    implementation library.springMongo
+
     testImplementation groups.forTest
 }

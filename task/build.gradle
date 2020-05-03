@@ -6,6 +6,7 @@ dependencies {
     implementation library.auth_api
     implementation library.team_api
     implementation library.task_api
+    implementation library.script_api
     implementation library.workload_api
     implementation library.scheduling_api
     implementation library.orchestration_api

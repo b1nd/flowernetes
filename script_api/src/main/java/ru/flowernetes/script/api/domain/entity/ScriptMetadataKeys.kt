@@ -4,7 +4,6 @@ enum class ScriptMetadataKeys {
     NAME,
     TAG,
     SOURCE,
-    WORKLOAD,
     RUN_FILE_PATH,
     IS_PUBLIC,
     TEAM_ID;

@@ -25,6 +25,8 @@ class TaskDtoMapper(
           memoryRequest = memoryQuantityParser.parse(it.memoryRequest),
           cpuLimit = cpuQuantityParser.parse(it.cpuLimit),
           memoryLimit = memoryQuantityParser.parse(it.memoryLimit),
+          saveLog = it.saveLog,
+          saveScript = it.saveScript,
           sourceScriptId = it.sourceScriptId
         )
     }

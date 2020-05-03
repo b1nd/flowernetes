@@ -1,19 +1,18 @@
 package ru.flowernetes.script.data.controller
 
 import org.springframework.core.io.InputStreamResource
-import org.springframework.http.HttpHeaders
-import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
+import ru.flowernetes.entity.file.FileDto
 import ru.flowernetes.entity.script.SourceScript
 import ru.flowernetes.pagination.api.domain.entity.Order
 import ru.flowernetes.pagination.api.domain.entity.Page
 import ru.flowernetes.pagination.api.domain.entity.PageRequest
 import ru.flowernetes.pagination.api.domain.entity.Sort
-import ru.flowernetes.script.api.domain.dto.FileDto
 import ru.flowernetes.script.api.domain.dto.SourceScriptDto
 import ru.flowernetes.script.api.domain.usecase.*
+import ru.flowernetes.util.file.toResponseEntity
 
 
 @RestController
@@ -60,14 +59,7 @@ class SourceScriptController(
 
     @GetMapping("/{id}/file")
     fun getSourceScriptFile(@PathVariable id: String): ResponseEntity<InputStreamResource> {
-        val fileDto = getSourceScriptFileDtoByIdUseCase.exec(id)
-        val resource = InputStreamResource(fileDto.inputStream)
-        val contentType = fileDto.contentType ?: MediaType.APPLICATION_OCTET_STREAM_VALUE
-
-        return ResponseEntity.ok()
-          .contentType(MediaType.parseMediaType(contentType))
-          .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"${fileDto.name}\"")
-          .body(resource)
+        return getSourceScriptFileDtoByIdUseCase.exec(id).toResponseEntity()
     }
 
     @DeleteMapping("/{id}")

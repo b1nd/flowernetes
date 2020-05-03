@@ -13,5 +13,7 @@ data class TaskDto(
   val memoryLimit: String,
   val cpuRequest: String,
   val cpuLimit: String,
+  val saveLog: Boolean,
+  val saveScript: Boolean,
   val sourceScriptId: String
 )

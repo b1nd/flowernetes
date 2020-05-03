@@ -5,6 +5,7 @@ import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.gridfs.GridFsTemplate
 import org.springframework.stereotype.Component
 import ru.flowernetes.entity.script.SourceScript
+import ru.flowernetes.script.api.domain.entity.NoSuchSourceScriptException
 import ru.flowernetes.script.api.domain.usecase.GetSourceScriptByIdUseCase
 import ru.flowernetes.script.data.mapper.GridFSFileToSourceScriptMapper
 
@@ -16,6 +17,7 @@ class GetSourceScriptByIdUseCaseImpl(
 
     override fun exec(id: String): SourceScript {
         val gridFSFile = gridFsTemplate.findOne(Query(Criteria.where("_id").`is`(id)))
+          ?: throw NoSuchSourceScriptException(id)
         return gridFSFileToSourceScriptMapper.map(gridFSFile)
     }
 }

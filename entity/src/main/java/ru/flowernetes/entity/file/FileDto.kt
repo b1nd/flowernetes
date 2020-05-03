@@ -1,4 +1,4 @@
-package ru.flowernetes.script.api.domain.dto
+package ru.flowernetes.entity.file
 
 import java.io.InputStream
 
