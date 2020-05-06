@@ -24,6 +24,8 @@ dependencies {
     implementation library.workload
     implementation library.scheduling_api
     implementation library.scheduling
+    implementation library.monitoring
+    implementation library.monitoring_api
     implementation library.auth_api
     implementation library.auth
     implementation library.swagger

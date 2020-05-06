@@ -13,6 +13,7 @@ class GetWorkflowByIdUseCaseImpl(
 ) : GetWorkflowByIdUseCase {
 
     override fun exec(id: Long): Workflow {
+        // todo: check if workflow public or caller is owner
         return workflowRepository.findByIdOrNull(id) ?: throw NoSuchWorkflowException(id)
     }
 }

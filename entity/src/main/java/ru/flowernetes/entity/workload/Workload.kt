@@ -11,6 +11,7 @@ data class Workload(
   @Id @GeneratedValue
   val id: Long = NOT_DEFINED_ID,
   val workloadCreationTime: LocalDateTime,
+  val lastTransitionTime: Long,
   @ManyToOne
   val task: Task,
   @Enumerated(EnumType.ORDINAL)

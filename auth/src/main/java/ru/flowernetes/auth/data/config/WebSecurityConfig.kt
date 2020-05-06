@@ -64,18 +64,12 @@ open class WebSecurityConfig(
             allowedOrigins = listOf(CorsConfiguration.ALL)
             allowedHeaders = listOf(CorsConfiguration.ALL)
             maxAge = 1800L
+            allowCredentials = true
 
             allowedHeaders = listOf(CorsConfiguration.ALL)
             exposedHeaders = listOf(HttpHeaders.CONTENT_DISPOSITION)
 
-            allowedMethods = listOf(
-              HttpMethod.DELETE.name,
-              HttpMethod.GET.name,
-              HttpMethod.HEAD.name,
-              HttpMethod.PATCH.name,
-              HttpMethod.POST.name,
-              HttpMethod.PUT.name
-            )
+            allowedMethods = listOf(CorsConfiguration.ALL)
         })
     }
 }

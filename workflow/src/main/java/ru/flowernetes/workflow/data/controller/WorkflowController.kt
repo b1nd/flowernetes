@@ -1,14 +1,12 @@
 package ru.flowernetes.workflow.data.controller
 
 import org.springframework.web.bind.annotation.*
+import ru.flowernetes.entity.monitoring.TaskStatusInfo
 import ru.flowernetes.entity.task.Task
 import ru.flowernetes.entity.workflow.Workflow
 import ru.flowernetes.task.api.domain.usecase.GetAllTasksByWorkflowUseCase
 import ru.flowernetes.workflow.api.domain.dto.WorkflowDto
-import ru.flowernetes.workflow.api.domain.usecase.AddWorkflowUseCase
-import ru.flowernetes.workflow.api.domain.usecase.GetAllWorkflowsUseCase
-import ru.flowernetes.workflow.api.domain.usecase.GetSessionWorkflowsUseCase
-import ru.flowernetes.workflow.api.domain.usecase.GetWorkflowByIdUseCase
+import ru.flowernetes.workflow.api.domain.usecase.*
 import ru.flowernetes.workflow.data.dto.AllWorkflowsDto
 
 @RestController
@@ -18,7 +16,8 @@ class WorkflowController(
   private val getSessionWorkflowsUseCase: GetSessionWorkflowsUseCase,
   private val getAllWorkflowsUseCase: GetAllWorkflowsUseCase,
   private val getWorkflowByIdUseCase: GetWorkflowByIdUseCase,
-  private val getAllTasksByWorkflowUseCase: GetAllTasksByWorkflowUseCase
+  private val getAllTasksByWorkflowUseCase: GetAllTasksByWorkflowUseCase,
+  private val getAllTasksStatusInfoUseCase: GetAllTasksStatusInfoUseCase
 ) {
 
     @PutMapping
@@ -39,5 +38,10 @@ class WorkflowController(
     @GetMapping("/{id}/tasks")
     fun getAllTasks(@PathVariable id: Long): List<Task> {
         return getWorkflowByIdUseCase.exec(id).let(getAllTasksByWorkflowUseCase::exec)
+    }
+
+    @GetMapping("/{id}/tasks/status")
+    fun getAllTasksStatusInfo(@PathVariable id: Long): List<TaskStatusInfo> {
+        return getWorkflowByIdUseCase.exec(id).let(getAllTasksStatusInfoUseCase::exec)
     }
 }

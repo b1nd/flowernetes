@@ -11,6 +11,7 @@ class WorkloadModelMapper : Mapper<WorkloadModel, Workload> {
     override fun map(it: WorkloadModel): Workload {
         return Workload(
           workloadCreationTime = LocalDateTime.now(),
+          lastTransitionTime = System.currentTimeMillis(),
           task = it.task,
           taskStatus = it.taskStatus,
           jobName = it.jobName,

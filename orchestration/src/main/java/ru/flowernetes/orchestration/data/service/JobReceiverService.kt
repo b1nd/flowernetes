@@ -66,6 +66,7 @@ open class JobReceiverService(
                                   taskStartTime = job.status.startTime?.let(jobTimeParser::parse),
                                   taskCompletionTime = job.status.completionTime?.let(jobTimeParser::parse),
                                   jobName = null,
+                                  lastTransitionTime = System.currentTimeMillis(),
                                   taskStatus = TaskStatus.SUCCESS
                                 ))
                                 deleteJob(job)
@@ -78,6 +79,7 @@ open class JobReceiverService(
                                   taskStartTime = job.status.startTime?.let(jobTimeParser::parse),
                                   taskCompletionTime = it.lastTransitionTime?.let(jobTimeParser::parse),
                                   jobName = null,
+                                  lastTransitionTime = System.currentTimeMillis(),
                                   taskStatus = TaskStatus.ERROR
                                 ))
                                 deleteJob(job)

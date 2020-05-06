@@ -7,4 +7,5 @@ import ru.flowernetes.entity.workload.Workload
 
 interface WorkloadRepository : JpaRepository<Workload, Long>, JpaSpecificationExecutor<Workload> {
     fun findAllByTask(task: Task): List<Workload>
+    fun findTopByTaskOrderByWorkloadCreationTimeDesc(task: Task): Workload?
 }

@@ -2,12 +2,10 @@ apply from: "$rootDir/gradle/scripts/spring-module.gradle"
 
 dependencies {
     implementation library.entity
-    implementation library.util
-    implementation library.team_api
-    implementation library.auth_api
-    implementation library.workflow_api
+    implementation library.workload_api
     implementation library.monitoring_api
-    implementation library.task_api
+
+    implementation library.springWebsocket
 
     testImplementation groups.forTest
 }
