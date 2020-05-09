@@ -3,6 +3,7 @@ package ru.flowernetes.workflow.data.controller
 import org.springframework.web.bind.annotation.*
 import ru.flowernetes.entity.monitoring.TaskStatusInfo
 import ru.flowernetes.entity.task.Task
+import ru.flowernetes.entity.workflow.Graph
 import ru.flowernetes.entity.workflow.Workflow
 import ru.flowernetes.task.api.domain.usecase.GetAllTasksByWorkflowUseCase
 import ru.flowernetes.workflow.api.domain.dto.WorkflowDto
@@ -17,7 +18,8 @@ class WorkflowController(
   private val getAllWorkflowsUseCase: GetAllWorkflowsUseCase,
   private val getWorkflowByIdUseCase: GetWorkflowByIdUseCase,
   private val getAllTasksByWorkflowUseCase: GetAllTasksByWorkflowUseCase,
-  private val getAllTasksStatusInfoUseCase: GetAllTasksStatusInfoUseCase
+  private val getAllTasksStatusInfoUseCase: GetAllTasksStatusInfoUseCase,
+  private val getWorkflowGraphUseCase: GetWorkflowGraphUseCase
 ) {
 
     @PutMapping
@@ -43,5 +45,10 @@ class WorkflowController(
     @GetMapping("/{id}/tasks/status")
     fun getAllTasksStatusInfo(@PathVariable id: Long): List<TaskStatusInfo> {
         return getWorkflowByIdUseCase.exec(id).let(getAllTasksStatusInfoUseCase::exec)
+    }
+
+    @GetMapping("/{id}/graph")
+    fun getWorkflowGraph(@PathVariable id: Long): Graph<Task, Long> {
+        return getWorkflowByIdUseCase.exec(id).let(getWorkflowGraphUseCase::exec)
     }
 }

@@ -16,7 +16,7 @@ class GetTaskStatusInfoFromWorkloadUseCaseImpl(
         return TaskStatusInfo(
           taskId = workload.task.id,
           taskStatus = taskStatus,
-          lastTransitionTime = System.currentTimeMillis()
+          lastTransitionTime = workload.lastTransitionTime
         )
     }
 }
