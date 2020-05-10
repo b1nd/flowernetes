@@ -5,10 +5,12 @@ import ru.flowernetes.entity.monitoring.TaskStatusInfo
 import ru.flowernetes.entity.task.Task
 import ru.flowernetes.entity.workflow.Graph
 import ru.flowernetes.entity.workflow.Workflow
+import ru.flowernetes.entity.workload.TaskDurationFilter
 import ru.flowernetes.task.api.domain.usecase.GetAllTasksByWorkflowUseCase
 import ru.flowernetes.workflow.api.domain.dto.WorkflowDto
 import ru.flowernetes.workflow.api.domain.usecase.*
 import ru.flowernetes.workflow.data.dto.AllWorkflowsDto
+import ru.flowernetes.workflow.data.dto.TasksDurationDto
 
 @RestController
 @RequestMapping("/workflows")
@@ -19,7 +21,8 @@ class WorkflowController(
   private val getWorkflowByIdUseCase: GetWorkflowByIdUseCase,
   private val getAllTasksByWorkflowUseCase: GetAllTasksByWorkflowUseCase,
   private val getAllTasksStatusInfoUseCase: GetAllTasksStatusInfoUseCase,
-  private val getWorkflowGraphUseCase: GetWorkflowGraphUseCase
+  private val getWorkflowGraphUseCase: GetWorkflowGraphUseCase,
+  private val getWorkflowTasksDurationUseCase: GetWorkflowTasksDurationUseCase
 ) {
 
     @PutMapping
@@ -50,5 +53,15 @@ class WorkflowController(
     @GetMapping("/{id}/graph")
     fun getWorkflowGraph(@PathVariable id: Long): Graph<Task, Long> {
         return getWorkflowByIdUseCase.exec(id).let(getWorkflowGraphUseCase::exec)
+    }
+
+    @PostMapping("/{id}/duration")
+    fun getWorkflowTasksDuration(
+      @PathVariable id: Long,
+      @RequestBody taskDurationFilter: TaskDurationFilter
+    ): TasksDurationDto {
+        return TasksDurationDto(
+          getWorkflowByIdUseCase.exec(id).let { getWorkflowTasksDurationUseCase.exec(it, taskDurationFilter) }
+        )
     }
 }
