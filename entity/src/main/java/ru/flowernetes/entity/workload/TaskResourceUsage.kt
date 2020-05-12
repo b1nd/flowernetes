@@ -2,7 +2,8 @@ package ru.flowernetes.entity.workload
 
 import ru.flowernetes.entity.task.Task
 
-data class TaskTimeInterval(
+data class TaskResourceUsage<T>(
   val task: Task,
-  val interval: TimeIntervalWithSeconds
+  val request: T,
+  val limit: T
 )

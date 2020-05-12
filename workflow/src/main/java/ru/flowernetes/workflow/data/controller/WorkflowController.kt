@@ -12,7 +12,9 @@ import ru.flowernetes.task.api.domain.usecase.GetAllTasksByWorkflowUseCase
 import ru.flowernetes.workflow.api.domain.dto.WorkflowDto
 import ru.flowernetes.workflow.api.domain.usecase.*
 import ru.flowernetes.workflow.data.dto.AllWorkflowsDto
+import ru.flowernetes.workflow.data.dto.TasksCpuUsagesDto
 import ru.flowernetes.workflow.data.dto.TasksDurationDto
+import ru.flowernetes.workflow.data.dto.TasksRamUsagesDto
 import java.time.LocalDate
 
 @RestController
@@ -26,6 +28,8 @@ class WorkflowController(
   private val getAllTasksStatusInfoUseCase: GetAllTasksStatusInfoUseCase,
   private val getWorkflowGraphUseCase: GetWorkflowGraphUseCase,
   private val getWorkflowGanttChartUseCase: GetWorkflowGanttChartUseCase,
+  private val getWorkflowTasksRamUsageUseCase: GetWorkflowTasksRamUsageUseCase,
+  private val getWorkflowTasksCpuUsageUseCase: GetWorkflowTasksCpuUsageUseCase,
   private val getWorkflowTasksDurationUseCase: GetWorkflowTasksDurationUseCase
 ) {
 
@@ -75,5 +79,23 @@ class WorkflowController(
       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) date: LocalDate = LocalDate.now()
     ): GanttChart {
         return getWorkflowByIdUseCase.exec(id).let { getWorkflowGanttChartUseCase.exec(it, date) }
+    }
+
+    @GetMapping("/{id}/ram")
+    fun getWorkflowRamUsage(
+      @PathVariable id: Long,
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) from: LocalDate = LocalDate.now(),
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) to: LocalDate = LocalDate.now()
+    ): TasksRamUsagesDto {
+        return TasksRamUsagesDto(getWorkflowTasksRamUsageUseCase.exec(getWorkflowByIdUseCase.exec(id), from, to))
+    }
+
+    @GetMapping("/{id}/cpu")
+    fun getWorkflowCpuUsage(
+      @PathVariable id: Long,
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) from: LocalDate = LocalDate.now(),
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) to: LocalDate = LocalDate.now()
+    ): TasksCpuUsagesDto {
+        return TasksCpuUsagesDto(getWorkflowTasksCpuUsageUseCase.exec(getWorkflowByIdUseCase.exec(id), from, to))
     }
 }
