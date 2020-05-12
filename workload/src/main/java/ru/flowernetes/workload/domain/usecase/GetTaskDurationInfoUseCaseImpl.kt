@@ -26,7 +26,7 @@ class GetTaskDurationInfoUseCaseImpl(
         if (taskWorkloads.isEmpty()) {
             return null
         }
-        val durations = taskWorkloads.map(::getTimeDurationInfo)
+        val durations = taskWorkloads.map(::getTimeDurationInfo).sortedBy { it.dateTime }
         val averageTime = durations.map { it.seconds }.average().roundToLong()
 
         return TaskDuration(
