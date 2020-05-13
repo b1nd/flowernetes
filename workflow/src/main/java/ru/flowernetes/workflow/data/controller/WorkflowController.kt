@@ -1,13 +1,11 @@
 package ru.flowernetes.workflow.data.controller
 
-import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.web.bind.annotation.*
 import ru.flowernetes.entity.monitoring.TaskStatusInfo
 import ru.flowernetes.entity.task.Task
 import ru.flowernetes.entity.workflow.GanttChart
 import ru.flowernetes.entity.workflow.Graph
 import ru.flowernetes.entity.workflow.Workflow
-import ru.flowernetes.entity.workload.TaskDurationFilter
 import ru.flowernetes.task.api.domain.usecase.GetAllTasksByWorkflowUseCase
 import ru.flowernetes.workflow.api.domain.dto.WorkflowDto
 import ru.flowernetes.workflow.api.domain.usecase.*
@@ -63,20 +61,21 @@ class WorkflowController(
         return getWorkflowByIdUseCase.exec(id).let(getWorkflowGraphUseCase::exec)
     }
 
-    @PostMapping("/{id}/duration")
+    @GetMapping("/{id}/duration")
     fun getWorkflowTasksDuration(
       @PathVariable id: Long,
-      @RequestBody taskDurationFilter: TaskDurationFilter
+      @RequestParam from: LocalDate = LocalDate.now(),
+      @RequestParam to: LocalDate = LocalDate.now()
     ): TasksDurationDto {
         return TasksDurationDto(
-          getWorkflowByIdUseCase.exec(id).let { getWorkflowTasksDurationUseCase.exec(it, taskDurationFilter) }
+          getWorkflowByIdUseCase.exec(id).let { getWorkflowTasksDurationUseCase.exec(it, from, to) }
         )
     }
 
     @GetMapping("/{id}/gantt")
     fun getWorkflowGanttChart(
       @PathVariable id: Long,
-      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) date: LocalDate = LocalDate.now()
+      @RequestParam date: LocalDate = LocalDate.now()
     ): GanttChart {
         return getWorkflowByIdUseCase.exec(id).let { getWorkflowGanttChartUseCase.exec(it, date) }
     }
@@ -84,8 +83,8 @@ class WorkflowController(
     @GetMapping("/{id}/ram")
     fun getWorkflowRamUsage(
       @PathVariable id: Long,
-      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) from: LocalDate = LocalDate.now(),
-      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) to: LocalDate = LocalDate.now()
+      @RequestParam from: LocalDate = LocalDate.now(),
+      @RequestParam to: LocalDate = LocalDate.now()
     ): TasksRamUsagesDto {
         return TasksRamUsagesDto(getWorkflowTasksRamUsageUseCase.exec(getWorkflowByIdUseCase.exec(id), from, to))
     }
@@ -93,8 +92,8 @@ class WorkflowController(
     @GetMapping("/{id}/cpu")
     fun getWorkflowCpuUsage(
       @PathVariable id: Long,
-      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) from: LocalDate = LocalDate.now(),
-      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) to: LocalDate = LocalDate.now()
+      @RequestParam from: LocalDate = LocalDate.now(),
+      @RequestParam to: LocalDate = LocalDate.now()
     ): TasksCpuUsagesDto {
         return TasksCpuUsagesDto(getWorkflowTasksCpuUsageUseCase.exec(getWorkflowByIdUseCase.exec(id), from, to))
     }
