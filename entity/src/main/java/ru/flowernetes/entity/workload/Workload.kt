@@ -18,7 +18,6 @@ data class Workload(
   val taskStatus: TaskStatus,
   val taskStartTime: LocalDateTime? = null,
   val taskCompletionTime: LocalDateTime? = null,
-  val jobName: String? = null,
   val baseImage: String,
   val memoryRequest: Long,
   val memoryLimit: Long,

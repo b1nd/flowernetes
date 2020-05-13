@@ -6,7 +6,6 @@ import ru.flowernetes.entity.task.TaskStatus
 data class WorkloadModel(
   val task: Task,
   val taskStatus: TaskStatus,
-  val jobName: String,
   val baseImage: String,
   val memoryRequest: Long,
   val memoryLimit: Long,

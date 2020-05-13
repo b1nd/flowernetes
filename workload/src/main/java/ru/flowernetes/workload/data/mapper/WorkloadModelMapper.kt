@@ -14,7 +14,6 @@ class WorkloadModelMapper : Mapper<WorkloadModel, Workload> {
           lastTransitionTime = System.currentTimeMillis(),
           task = it.task,
           taskStatus = it.taskStatus,
-          jobName = it.jobName,
           baseImage = it.baseImage,
           memoryRequest = it.memoryRequest,
           memoryLimit = it.memoryLimit,

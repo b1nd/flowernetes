@@ -37,7 +37,7 @@ open class RunTaskUseCaseImpl(
         log.info("Running $task")
         val jobName = taskJobNameProvider.get(task)
 
-        val workload = addNewWorkload(task, jobName)
+        val workload = addNewWorkload(task)
 
         val image = getTaskImageOrCreateUseCase.exec(task)
         val namespace = task.workflow.team.namespace
@@ -86,11 +86,10 @@ open class RunTaskUseCaseImpl(
         }
     }
 
-    private fun addNewWorkload(task: Task, jobName: String): Workload {
+    private fun addNewWorkload(task: Task): Workload {
         return addWorkloadUseCase.exec(WorkloadModel(
           task = task,
           taskStatus = TaskStatus.PENDING,
-          jobName = jobName,
           baseImage = task.baseImage,
           memoryRequest = task.memoryRequest,
           memoryLimit = task.memoryLimit,
