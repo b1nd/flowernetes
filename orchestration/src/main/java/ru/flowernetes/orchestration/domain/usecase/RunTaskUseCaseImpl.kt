@@ -42,6 +42,7 @@ open class RunTaskUseCaseImpl(
         val image = getTaskImageOrCreateUseCase.exec(task)
         val namespace = task.workflow.team.namespace
 
+        // todo: workload created but if fails status will forever be pending
         checkJobNameNotExists(namespace, jobName)
 
         val job = JobBuilder()

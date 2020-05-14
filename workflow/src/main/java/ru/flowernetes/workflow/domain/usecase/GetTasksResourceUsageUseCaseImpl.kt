@@ -1,22 +1,22 @@
 package ru.flowernetes.workflow.domain.usecase
 
 import org.springframework.stereotype.Component
-import ru.flowernetes.entity.workflow.Workflow
+import ru.flowernetes.entity.task.Task
 import ru.flowernetes.entity.workload.TaskResourceUsage
 import ru.flowernetes.entity.workload.TasksResourceUsage
 import ru.flowernetes.entity.workload.Workload
-import ru.flowernetes.workflow.api.domain.usecase.GetWorkflowTasksResourceUsageUseCase
-import ru.flowernetes.workflow.api.domain.usecase.GetWorkflowTasksTimeIntervalsToWorkloadsUseCase
+import ru.flowernetes.workflow.api.domain.usecase.GetTasksResourceUsageUseCase
+import ru.flowernetes.workflow.api.domain.usecase.GetTasksTimeIntervalsToWorkloadsUseCase
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Component
-class GetWorkflowTasksResourceUsageUseCaseImpl(
-  private val getWorkflowTasksTimeIntervalsToWorkloadsUseCase: GetWorkflowTasksTimeIntervalsToWorkloadsUseCase
-) : GetWorkflowTasksResourceUsageUseCase {
+class GetTasksResourceUsageUseCaseImpl(
+  private val getTasksTimeIntervalsToWorkloadsUseCase: GetTasksTimeIntervalsToWorkloadsUseCase
+) : GetTasksResourceUsageUseCase {
 
     override fun <T, R> exec(
-      workflow: Workflow,
+      tasks: List<Task>,
       from: LocalDate,
       to: LocalDate,
       selectionRequest: (Workload) -> T,
@@ -31,8 +31,8 @@ class GetWorkflowTasksResourceUsageUseCaseImpl(
           totalLimit = empty
         )
 
-        val timeIntervalsToWorkloads = getWorkflowTasksTimeIntervalsToWorkloadsUseCase.exec(
-          workflow = workflow,
+        val timeIntervalsToWorkloads = getTasksTimeIntervalsToWorkloadsUseCase.exec(
+          tasks = tasks,
           from = from,
           to = to
         ).toList().sortedBy { (interval, _) -> interval.from }

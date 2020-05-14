@@ -5,6 +5,7 @@ dependencies {
     implementation library.util
     implementation library.auth_api
     implementation library.team_api
+    implementation library.workflow_api
     implementation library.orchestration_api
 
     testImplementation groups.forTest

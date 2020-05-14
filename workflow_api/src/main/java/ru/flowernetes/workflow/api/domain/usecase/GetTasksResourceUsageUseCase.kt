@@ -1,13 +1,13 @@
 package ru.flowernetes.workflow.api.domain.usecase
 
-import ru.flowernetes.entity.workflow.Workflow
+import ru.flowernetes.entity.task.Task
 import ru.flowernetes.entity.workload.TasksResourceUsage
 import ru.flowernetes.entity.workload.Workload
 import java.time.LocalDate
 
-interface GetWorkflowTasksResourceUsageUseCase {
+interface GetTasksResourceUsageUseCase {
     fun <T, R> exec(
-      workflow: Workflow,
+      tasks: List<Task>,
       from: LocalDate,
       to: LocalDate,
       selectionRequest: (Workload) -> T,
