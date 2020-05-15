@@ -8,6 +8,7 @@ dependencies {
     implementation library.task_api
     implementation library.script_api
     implementation library.workload_api
+    implementation library.workflow_api
     implementation library.scheduling_api
     implementation library.orchestration_api
 

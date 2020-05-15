@@ -4,27 +4,26 @@ import org.springframework.stereotype.Component
 import ru.flowernetes.entity.task.Task
 import ru.flowernetes.scheduling.api.domain.usecase.ScheduleTaskUseCase
 import ru.flowernetes.task.api.domain.dto.TaskDto
-import ru.flowernetes.task.api.domain.usecase.AddTaskDependenciesFromLogicConditionUseCase
-import ru.flowernetes.task.api.domain.usecase.AddTaskUseCase
-import ru.flowernetes.task.api.domain.usecase.CheckTaskNotExceedResourceQuotaUseCase
-import ru.flowernetes.task.api.domain.usecase.ValidateTaskUseCase
+import ru.flowernetes.task.api.domain.usecase.*
 import ru.flowernetes.task.data.mapper.TaskDtoMapper
 import ru.flowernetes.task.data.repo.TaskRepository
 
 @Component
-class AddTaskUseCaseImpl(
+class UpdateTaskUseCaseImpl(
   private val taskRepository: TaskRepository,
   private val validateTaskUseCase: ValidateTaskUseCase,
   private val checkTaskNotExceedResourceQuotaUseCase: CheckTaskNotExceedResourceQuotaUseCase,
   private val addTaskDependenciesFromLogicConditionUseCase: AddTaskDependenciesFromLogicConditionUseCase,
+  private val checkTaskDependenciesHasNoCyclesUseCase: CheckTaskDependenciesHasNoCyclesUseCase,
   private val scheduleTaskUseCase: ScheduleTaskUseCase,
   private val taskDtoMapper: TaskDtoMapper
-) : AddTaskUseCase {
+) : UpdateTaskUseCase {
 
-    override fun exec(taskDto: TaskDto): Task {
+    override fun exec(taskId: Long, taskDto: TaskDto): Task {
         validateTaskUseCase.exec(taskDto)
 
-        val mappedTask = taskDtoMapper.map(taskDto)
+        val mappedTask = taskDtoMapper.map(taskDto).copy(id = taskId)
+        checkTaskDependenciesHasNoCyclesUseCase.exec(mappedTask)
         checkTaskNotExceedResourceQuotaUseCase.exec(mappedTask)
 
         val task = taskRepository.save(mappedTask)
