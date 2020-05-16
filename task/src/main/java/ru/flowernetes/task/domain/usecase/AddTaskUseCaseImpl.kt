@@ -4,10 +4,7 @@ import org.springframework.stereotype.Component
 import ru.flowernetes.entity.task.Task
 import ru.flowernetes.scheduling.api.domain.usecase.ScheduleTaskUseCase
 import ru.flowernetes.task.api.domain.dto.TaskDto
-import ru.flowernetes.task.api.domain.usecase.AddTaskDependenciesFromLogicConditionUseCase
-import ru.flowernetes.task.api.domain.usecase.AddTaskUseCase
-import ru.flowernetes.task.api.domain.usecase.CheckTaskNotExceedResourceQuotaUseCase
-import ru.flowernetes.task.api.domain.usecase.ValidateTaskUseCase
+import ru.flowernetes.task.api.domain.usecase.*
 import ru.flowernetes.task.data.mapper.TaskDtoMapper
 import ru.flowernetes.task.data.repo.TaskRepository
 
@@ -15,6 +12,7 @@ import ru.flowernetes.task.data.repo.TaskRepository
 class AddTaskUseCaseImpl(
   private val taskRepository: TaskRepository,
   private val validateTaskUseCase: ValidateTaskUseCase,
+  private val checkTaskNameIsUniqueUseCase: CheckTaskNameIsUniqueUseCase,
   private val checkTaskNotExceedResourceQuotaUseCase: CheckTaskNotExceedResourceQuotaUseCase,
   private val addTaskDependenciesFromLogicConditionUseCase: AddTaskDependenciesFromLogicConditionUseCase,
   private val scheduleTaskUseCase: ScheduleTaskUseCase,
@@ -25,6 +23,7 @@ class AddTaskUseCaseImpl(
         validateTaskUseCase.exec(taskDto)
 
         val mappedTask = taskDtoMapper.map(taskDto)
+        checkTaskNameIsUniqueUseCase.exec(mappedTask)
         checkTaskNotExceedResourceQuotaUseCase.exec(mappedTask)
 
         val task = taskRepository.save(mappedTask)

@@ -9,4 +9,5 @@ interface TaskRepository : JpaRepository<Task, Long> {
     fun findAllByWorkflow(workflow: Workflow): List<Task>
     fun findAllByScheduledIsTrue(): List<Task>
     fun findAllByWorkflow_TeamOrWorkflow_IsPublicIsTrue(team: Team): List<Task>
+    fun findByWorkflowAndName(workflow: Workflow, taskName: String): Task?
 }

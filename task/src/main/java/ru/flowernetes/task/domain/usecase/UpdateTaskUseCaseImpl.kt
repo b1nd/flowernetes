@@ -12,6 +12,7 @@ import ru.flowernetes.task.data.repo.TaskRepository
 class UpdateTaskUseCaseImpl(
   private val taskRepository: TaskRepository,
   private val validateTaskUseCase: ValidateTaskUseCase,
+  private val checkTaskNameIsUniqueUseCase: CheckTaskNameIsUniqueUseCase,
   private val checkTaskNotExceedResourceQuotaUseCase: CheckTaskNotExceedResourceQuotaUseCase,
   private val addTaskDependenciesFromLogicConditionUseCase: AddTaskDependenciesFromLogicConditionUseCase,
   private val checkTaskDependenciesHasNoCyclesUseCase: CheckTaskDependenciesHasNoCyclesUseCase,
@@ -23,8 +24,9 @@ class UpdateTaskUseCaseImpl(
         validateTaskUseCase.exec(taskDto)
 
         val mappedTask = taskDtoMapper.map(taskDto).copy(id = taskId)
-        checkTaskDependenciesHasNoCyclesUseCase.exec(mappedTask)
+        checkTaskNameIsUniqueUseCase.exec(mappedTask)
         checkTaskNotExceedResourceQuotaUseCase.exec(mappedTask)
+        checkTaskDependenciesHasNoCyclesUseCase.exec(mappedTask)
 
         val task = taskRepository.save(mappedTask)
         taskDto.conditions.logicCondition?.let {
