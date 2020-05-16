@@ -8,15 +8,14 @@ import ru.flowernetes.entity.task.TaskStatus
 import ru.flowernetes.entity.workload.Workload
 import ru.flowernetes.orchestration.api.domain.usecase.RunTaskUseCase
 import ru.flowernetes.scheduling.api.domain.usecase.OnSchedulingWorkloadUpdateUseCase
-import ru.flowernetes.task.api.domain.usecase.IsTaskConditionSatisfiedUseCase
-import ru.flowernetes.task.api.domain.usecase.MarkAllDependentTasksAndGetThemUseCase
-import ru.flowernetes.task.api.domain.usecase.UnmarkTaskDependencyMarkersUseCase
+import ru.flowernetes.task.api.domain.usecase.*
 
 @Component
 open class OnSchedulingWorkloadUpdateUseCaseImpl(
   private val markAllDependentTasksAndGetThemUseCase: MarkAllDependentTasksAndGetThemUseCase,
   private val isTaskConditionSatisfiedUseCase: IsTaskConditionSatisfiedUseCase,
   private val unmarkTaskDependencyMarkersUseCase: UnmarkTaskDependencyMarkersUseCase,
+  private val removeTaskFromScheduleUseCase: RemoveTaskFromScheduleUseCase,
   private val runTaskUseCase: RunTaskUseCase
 ) : OnSchedulingWorkloadUpdateUseCase {
 
@@ -35,6 +34,9 @@ open class OnSchedulingWorkloadUpdateUseCaseImpl(
                         runTaskUseCase.execAsync(it)
                     }
                 }
+            }
+            TaskStatus.ERROR -> {
+                removeTaskFromScheduleUseCase.exec(workload.task)
             }
             else -> log.debug("Skipping update $workload")
         }

@@ -12,6 +12,8 @@ class GetTaskStatusFromWorkloadUseCaseImpl : GetTaskStatusFromWorkloadUseCase {
 
         return when (workload.taskStatus) {
             TaskStatus.SUCCESS -> TaskStatus.WAITING
+            TaskStatus.QUOTA_EXCEEDED -> TaskStatus.WAITING
+            TaskStatus.KILLED -> TaskStatus.WAITING
             else -> workload.taskStatus
         }
     }

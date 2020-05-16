@@ -42,7 +42,7 @@ class CheckTaskDependenciesHasNoCyclesUseCaseImpl(
         val tasks = taskDependencies.map(getTaskByIdUseCase::exec)
         tasks.forEach {
             if (dependencies.add(it)) {
-                getAllDependencies(task, dependencies)
+                getAllDependencies(it, dependencies)
             }
         }
     }

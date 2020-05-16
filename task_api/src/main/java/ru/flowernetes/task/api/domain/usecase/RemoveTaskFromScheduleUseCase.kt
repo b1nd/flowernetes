@@ -1,4 +1,4 @@
-package ru.flowernetes.scheduling.api.domain.usecase
+package ru.flowernetes.task.api.domain.usecase
 
 import ru.flowernetes.entity.task.Task
 

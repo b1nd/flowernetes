@@ -5,13 +5,13 @@ import org.springframework.stereotype.Component
 import ru.flowernetes.entity.task.Conditions
 import ru.flowernetes.entity.task.Task
 import ru.flowernetes.scheduling.api.domain.usecase.RemoveCronScheduleUseCase
-import ru.flowernetes.scheduling.api.domain.usecase.RemoveTaskFromScheduleUseCase
+import ru.flowernetes.scheduling.api.domain.usecase.RemoveTaskScheduleUseCase
 
 @Component
-class RemoveTaskFromScheduleUseCaseImpl(
+class RemoveTaskScheduleUseCaseImpl(
   private val objectMapper: ObjectMapper,
   private val removeCronScheduleUseCase: RemoveCronScheduleUseCase
-) : RemoveTaskFromScheduleUseCase {
+) : RemoveTaskScheduleUseCase {
 
     override fun exec(task: Task) {
         val conditions = objectMapper.readValue(task.conditionsJson, Conditions::class.java)

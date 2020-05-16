@@ -2,6 +2,8 @@ package ru.flowernetes.task.domain.usecase
 
 import org.springframework.stereotype.Component
 import ru.flowernetes.entity.task.Task
+import ru.flowernetes.monitoring.api.domain.usecase.GetTaskStatusInfoUseCase
+import ru.flowernetes.monitoring.api.domain.usecase.SendWorkflowTaskStatusMessageUseCase
 import ru.flowernetes.scheduling.api.domain.usecase.ScheduleTaskUseCase
 import ru.flowernetes.task.api.domain.dto.TaskDto
 import ru.flowernetes.task.api.domain.usecase.*
@@ -15,6 +17,8 @@ class AddTaskUseCaseImpl(
   private val checkTaskNameIsUniqueUseCase: CheckTaskNameIsUniqueUseCase,
   private val checkTaskNotExceedResourceQuotaUseCase: CheckTaskNotExceedResourceQuotaUseCase,
   private val addTaskDependenciesFromLogicConditionUseCase: AddTaskDependenciesFromLogicConditionUseCase,
+  private val getTaskStatusInfoUseCase: GetTaskStatusInfoUseCase,
+  private val sendWorkflowTaskStatusMessageUseCase: SendWorkflowTaskStatusMessageUseCase,
   private val scheduleTaskUseCase: ScheduleTaskUseCase,
   private val taskDtoMapper: TaskDtoMapper
 ) : AddTaskUseCase {
@@ -31,6 +35,9 @@ class AddTaskUseCaseImpl(
             addTaskDependenciesFromLogicConditionUseCase.exec(task, it)
         }
         if (task.scheduled) scheduleTaskUseCase.exec(task)
+
+        val taskStatusInfo = getTaskStatusInfoUseCase.exec(task)
+        sendWorkflowTaskStatusMessageUseCase.exec(task.workflow, taskStatusInfo)
 
         return task
     }

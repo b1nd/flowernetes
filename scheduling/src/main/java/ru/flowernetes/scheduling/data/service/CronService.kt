@@ -16,6 +16,7 @@ class CronService(
     private val taskIdToScheduledTask = mutableMapOf<Long, ScheduledTask>()
 
     fun addCronTask(task: Task, cronExpression: String) {
+        removeCronTask(task)
         val scheduledTask = scheduledTaskRegistrar.scheduleCronTask(CronTask(
           { runTaskUseCase.execAsync(task) }, CronTrigger(cronExpression)
         ))

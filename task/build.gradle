@@ -10,6 +10,7 @@ dependencies {
     implementation library.workload_api
     implementation library.workflow_api
     implementation library.scheduling_api
+    implementation library.monitoring_api
     implementation library.orchestration_api
 
     testImplementation groups.forTest

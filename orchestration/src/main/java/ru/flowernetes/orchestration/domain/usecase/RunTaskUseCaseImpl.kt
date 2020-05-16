@@ -17,8 +17,11 @@ import ru.flowernetes.orchestration.MEMORY_RESOURCE
 import ru.flowernetes.orchestration.api.domain.entity.JobLabelKeys
 import ru.flowernetes.orchestration.api.domain.usecase.RunTaskUseCase
 import ru.flowernetes.orchestration.data.provider.TaskJobNameProvider
+import ru.flowernetes.task.api.domain.usecase.CheckTaskNotExceedResourceQuotaUseCase
 import ru.flowernetes.workload.api.domain.model.WorkloadModel
 import ru.flowernetes.workload.api.domain.usecase.AddWorkloadUseCase
+import ru.flowernetes.workload.api.domain.usecase.UpdateWorkloadUseCase
+import java.time.LocalDateTime
 
 @Component
 open class RunTaskUseCaseImpl(
@@ -26,6 +29,8 @@ open class RunTaskUseCaseImpl(
   private val taskJobNameProvider: TaskJobNameProvider,
   private val kubernetesClient: KubernetesClient,
   private val addWorkloadUseCase: AddWorkloadUseCase,
+  private val checkTaskNotExceedResourceQuotaUseCase: CheckTaskNotExceedResourceQuotaUseCase,
+  private val updateWorkloadUseCase: UpdateWorkloadUseCase,
   @Value("\${kubernetes.api.version}")
   private val kubernetesApiVersion: String
 ) : RunTaskUseCase {
@@ -36,14 +41,24 @@ open class RunTaskUseCaseImpl(
     override fun execAsync(task: Task) {
         log.info("Running $task")
         val jobName = taskJobNameProvider.get(task)
-
-        val workload = addNewWorkload(task)
-
-        val image = getTaskImageOrCreateUseCase.exec(task)
         val namespace = task.workflow.team.namespace
+        val workload = addNewWorkload(task)
+        val image = getTaskImageOrCreateUseCase.exec(task)
 
-        // todo: workload created but if fails status will forever be pending
-        checkJobNameNotExists(namespace, jobName)
+        kotlin.runCatching {
+            checkTaskNotExceedResourceQuotaUseCase.exec(task)
+        }.onFailure {
+            logError(it)
+            updateWorkloadOnError(workload, TaskStatus.QUOTA_EXCEEDED)
+            return@execAsync
+        }
+        kotlin.runCatching {
+            checkJobNameNotExists(namespace, jobName)
+        }.onFailure {
+            logError(it)
+            updateWorkloadOnError(workload, TaskStatus.KILLED)
+            return@execAsync
+        }
 
         val job = JobBuilder()
           .withApiVersion("batch/$kubernetesApiVersion")
@@ -85,6 +100,19 @@ open class RunTaskUseCaseImpl(
         kubernetesClient.batch().jobs().inNamespace(namespace).withName(jobName).get()?.let {
             throw IllegalStateException("Job with name $jobName already exists")
         }
+    }
+
+    private fun logError(throwable: Throwable) {
+        log.error("Run task failed: ${throwable.message}", throwable)
+    }
+
+    private fun updateWorkloadOnError(workload: Workload, taskStatus: TaskStatus): Workload {
+        return updateWorkloadUseCase.exec(workload.copy(
+          taskStartTime = LocalDateTime.now(),
+          taskCompletionTime = LocalDateTime.now(),
+          lastTransitionTime = System.currentTimeMillis(),
+          taskStatus = taskStatus
+        ))
     }
 
     private fun addNewWorkload(task: Task): Workload {

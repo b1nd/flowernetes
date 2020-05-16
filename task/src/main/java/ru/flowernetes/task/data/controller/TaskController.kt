@@ -13,6 +13,7 @@ class TaskController(
   private val getTaskByIdUseCase: GetTaskByIdUseCase,
   private val deleteTaskByIdUseCase: DeleteTaskByIdUseCase,
   private val userRunTaskUseCase: UserRunTaskUseCase,
+  private val userKillTaskUseCase: UserKillTaskUseCase,
   private val userScheduleTaskUseCase: UserScheduleTaskUseCase,
   private val updateTaskUseCase: UpdateTaskUseCase,
   private val getSessionTasksUseCase: GetSessionTasksUseCase,
@@ -47,6 +48,11 @@ class TaskController(
     @PostMapping("/{id}/run")
     fun runTask(@PathVariable id: Long) {
         getTaskByIdUseCase.exec(id).also(userRunTaskUseCase::exec)
+    }
+
+    @PostMapping("/{id}/kill")
+    fun killTask(@PathVariable id: Long) {
+        getTaskByIdUseCase.exec(id).also(userKillTaskUseCase::exec)
     }
 
     @PostMapping("/{id}/schedule")

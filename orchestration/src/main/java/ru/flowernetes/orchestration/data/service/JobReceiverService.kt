@@ -9,12 +9,13 @@ import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import ru.flowernetes.entity.task.TaskStatus
 import ru.flowernetes.orchestration.api.domain.entity.JobLabelKeys
-import ru.flowernetes.orchestration.api.domain.entity.NoSuchJobLabelException
 import ru.flowernetes.orchestration.api.domain.usecase.SaveLogAndDataFromLogReaderUseCase
 import ru.flowernetes.orchestration.api.domain.usecase.SaveLogFromLogReaderUseCase
+import ru.flowernetes.orchestration.checkJobHasRequiredLabels
 import ru.flowernetes.orchestration.data.dto.JobStatus
 import ru.flowernetes.orchestration.data.dto.JobStatusType
 import ru.flowernetes.orchestration.data.parser.JobTimeParser
+import ru.flowernetes.orchestration.getLabel
 import ru.flowernetes.workload.api.domain.usecase.GetWorkloadByIdUseCase
 import ru.flowernetes.workload.api.domain.usecase.UpdateWorkloadUseCase
 import java.io.Reader
@@ -100,19 +101,10 @@ open class JobReceiverService(
         return kubernetesClient.batch().jobs().delete(job)
     }
 
-    private fun Job.getLabel(jobLabelKey: JobLabelKeys): String {
-        return metadata.labels[jobLabelKey.name] ?: throw NoSuchJobLabelException(toString(), jobLabelKey)
-    }
-
     private fun Job.reader(): Reader {
         return kubernetesClient.batch().jobs()
           .inNamespace(metadata.namespace)
           .withName(metadata.name)
           .logReader
-    }
-
-    private fun checkJobHasRequiredLabels(job: Job): Boolean {
-        val labels = job.metadata.labels
-        return labels.containsKey(JobLabelKeys.WORKLOAD_ID.name)
     }
 }

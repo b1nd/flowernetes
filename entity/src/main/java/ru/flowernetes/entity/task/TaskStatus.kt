@@ -6,5 +6,7 @@ enum class TaskStatus {
     PENDING,
     RUNNING,
     SUCCESS,
-    ERROR
+    ERROR,
+    KILLED,
+    QUOTA_EXCEEDED
 }
