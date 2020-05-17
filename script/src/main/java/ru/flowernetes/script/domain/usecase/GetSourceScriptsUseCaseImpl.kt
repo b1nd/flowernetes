@@ -27,7 +27,20 @@ class GetSourceScriptsUseCaseImpl(
 ) : GetSourceScriptsUseCase {
 
     override fun exec(pageRequest: PageRequest): Page<SourceScript> {
-        val pageable = pageRequest.toSpringPageRequest()
+        val pageable = pageRequest.copy(
+          sort = pageRequest.sort.copy(
+            orders = pageRequest.sort.orders.map {
+                it.copy(
+                  property = when (val prop = it.property) {
+                      "id" -> "_id"
+                      "name" -> ScriptMetadataKeys.NAME.key
+                      "tag" -> ScriptMetadataKeys.TAG.key
+                      "runFilePath" -> ScriptMetadataKeys.RUN_FILE_PATH.key
+                      "teamId" -> ScriptMetadataKeys.TEAM_ID.key
+                      "isPublic" -> ScriptMetadataKeys.IS_PUBLIC.key
+                      else -> prop
+                  })
+            })).toSpringPageRequest()
         val sourceCriteria = Criteria.where(ScriptMetadataKeys.SOURCE.key).exists(true)
 
         val criteria = when (getCallingUserSystemRoleUseCase.execute().role) {
@@ -41,17 +54,18 @@ class GetSourceScriptsUseCaseImpl(
             SystemUserRole.ADMIN -> sourceCriteria
         }
 
-        // fixme: Pageable with Query dont work???
-        val items = gridFsTemplate.find(Query(criteria).with(pageable.sort)).toList()
-        val itemsCount = items.count()
-
-        val start = pageable.offset.toInt()
-        val end = if (start + pageable.pageSize > itemsCount) itemsCount else start + pageable.pageSize
+        val files = gridFsTemplate.find(Query(criteria).with(pageable))
+        val itemsCount = files.count().toLong()
+        val items = files
+          .skip(pageable.offset.toInt())
+          .limit(pageable.pageSize)
+          .toList()
+          .map(gridFSFileToSourceScriptMapper::map)
 
         return PageImpl(
-          items.subList(start, end).map(gridFSFileToSourceScriptMapper::map),
+          items,
           pageable,
-          itemsCount.toLong()
+          itemsCount
         ).toPage()
     }
 }
