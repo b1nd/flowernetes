@@ -1,6 +1,6 @@
 package ru.flowernetes.pagination.api.domain.entity
 
-enum class Order {
-    ASCENDING,
-    DESCENDING
-}
+data class Order(
+  val property: String,
+  val direction: Direction
+)

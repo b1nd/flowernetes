@@ -4,10 +4,10 @@ import org.springframework.core.io.InputStreamResource
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import ru.flowernetes.entity.workload.Workload
-import ru.flowernetes.pagination.api.domain.entity.Order
+import ru.flowernetes.pagination.api.domain.entity.Direction
 import ru.flowernetes.pagination.api.domain.entity.Page
 import ru.flowernetes.pagination.api.domain.entity.PageRequest
-import ru.flowernetes.pagination.api.domain.entity.Sort
+import ru.flowernetes.util.extensions.zip
 import ru.flowernetes.util.file.toResponseEntity
 import ru.flowernetes.workload.api.domain.usecase.GetWorkloadLogFileDtoByWorkloadIdUseCase
 import ru.flowernetes.workload.api.domain.usecase.GetWorkloadOutputFileDtoByWorkloadIdUseCase
@@ -25,10 +25,10 @@ class WorkloadController(
     fun getWorkloadsPage(
       @RequestParam page: Int,
       @RequestParam size: Int,
-      @RequestParam(defaultValue = "DESCENDING") order: Order,
-      @RequestParam(defaultValue = "workloadCreationTime") orderBy: Array<String>
+      @RequestParam(defaultValue = "workloadCreationTime") property: Array<String>,
+      @RequestParam(defaultValue = "DESCENDING") direction: Array<Direction>
     ): Page<Workload> {
-        return getWorkloadsUseCase.exec(PageRequest(page, size, Sort(order, orderBy.toList())))
+        return getWorkloadsUseCase.exec(PageRequest(page, size, zip(property, direction)))
     }
 
     @GetMapping("/{id}/log")
