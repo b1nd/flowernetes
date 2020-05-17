@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import ru.flowernetes.entity.task.TaskStatus
+import ru.flowernetes.orchestration.JOB_NAME_LABEL
+import ru.flowernetes.orchestration.JobConditionReason
 import ru.flowernetes.orchestration.api.domain.entity.JobLabelKeys
 import ru.flowernetes.orchestration.api.domain.usecase.SaveLogAndDataFromLogReaderUseCase
 import ru.flowernetes.orchestration.api.domain.usecase.SaveLogFromLogReaderUseCase
@@ -45,7 +47,7 @@ open class JobReceiverService(
             getWorkloadByIdUseCase.exec(workloadId)
         }.getOrElse {
             log.error(it.message, it)
-            deleteJob(job)
+            job.delete()
             return
         }
 
@@ -61,27 +63,48 @@ open class JobReceiverService(
                     null -> {
                         job.status.conditions.forEach {
                             if (it.type == JobStatusType.Complete.name && it.status == JobStatus.True.name) {
-                                saveLogAndDataFromLogReaderUseCase.exec(workload, job.reader())
-
+                                kotlin.runCatching {
+                                    saveLogAndDataFromLogReaderUseCase.exec(workload, job.reader())
+                                }.onFailure { exception ->
+                                    log.error(exception.message, exception)
+                                    // todo: update workload doesn't have log and data
+                                }
                                 updateWorkloadUseCase.exec(workload.copy(
                                   taskStartTime = job.status.startTime?.let(jobTimeParser::parse),
                                   taskCompletionTime = job.status.completionTime?.let(jobTimeParser::parse),
                                   lastTransitionTime = System.currentTimeMillis(),
                                   taskStatus = TaskStatus.SUCCESS
                                 ))
-                                deleteJob(job)
+                                job.delete()
                                 return
                             }
                             if (it.type == JobStatusType.Failed.name && it.status == JobStatus.True.name) {
-                                saveLogFromLogReaderUseCase.exec(workload, job.reader())
-
-                                updateWorkloadUseCase.exec(workload.copy(
-                                  taskStartTime = job.status.startTime?.let(jobTimeParser::parse),
-                                  taskCompletionTime = it.lastTransitionTime?.let(jobTimeParser::parse),
-                                  lastTransitionTime = System.currentTimeMillis(),
-                                  taskStatus = TaskStatus.ERROR
-                                ))
-                                deleteJob(job)
+                                when (it.reason) {
+                                    JobConditionReason.DeadlineExceeded.name -> {
+                                        // todo: update workload doesn't have log
+                                        updateWorkloadUseCase.exec(workload.copy(
+                                          taskStartTime = job.status.startTime?.let(jobTimeParser::parse),
+                                          taskCompletionTime = it.lastTransitionTime?.let(jobTimeParser::parse),
+                                          lastTransitionTime = System.currentTimeMillis(),
+                                          taskStatus = TaskStatus.TIME_EXCEEDED
+                                        ))
+                                    }
+                                    else -> {
+                                        kotlin.runCatching {
+                                            saveLogFromLogReaderUseCase.exec(workload, job.reader())
+                                        }.onFailure { exception ->
+                                            log.error(exception.message, exception)
+                                            // todo: update workload doesn't have log
+                                        }
+                                        updateWorkloadUseCase.exec(workload.copy(
+                                          taskStartTime = job.status.startTime?.let(jobTimeParser::parse),
+                                          taskCompletionTime = it.lastTransitionTime?.let(jobTimeParser::parse),
+                                          lastTransitionTime = System.currentTimeMillis(),
+                                          taskStatus = TaskStatus.ERROR
+                                        ))
+                                    }
+                                }
+                                job.delete()
                                 return
                             }
                         }
@@ -97,14 +120,24 @@ open class JobReceiverService(
         }
     }
 
-    private fun deleteJob(job: Job): Boolean {
-        return kubernetesClient.batch().jobs().delete(job)
+    private fun Job.reader(): Reader {
+        val pods = kubernetesClient.pods()
+          .inNamespace(metadata.namespace)
+          .withLabel(JOB_NAME_LABEL, metadata.name)
+          .list()
+          .items
+        val lastPod = pods.maxBy { pod ->
+            pod.status.conditions
+              .mapNotNull { it.lastTransitionTime?.let(jobTimeParser::parse) }
+              .max() ?: throw IllegalStateException("Pod ${pod.metadata.name} has no conditions")
+        } ?: throw IllegalStateException("Job ${metadata.name} has no pods")
+        return kubernetesClient.pods()
+          .inNamespace(metadata.namespace)
+          .withName(lastPod.metadata.name)
+          .logReader
     }
 
-    private fun Job.reader(): Reader {
-        return kubernetesClient.batch().jobs()
-          .inNamespace(metadata.namespace)
-          .withName(metadata.name)
-          .logReader
+    private fun Job.delete(): Boolean {
+        return kubernetesClient.batch().jobs().delete(this)
     }
 }

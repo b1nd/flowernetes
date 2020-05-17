@@ -23,8 +23,24 @@ class ValidateTaskUseCaseImpl(
     override fun exec(taskDto: TaskDto) {
         val workflow = getWorkflowByIdUseCase.exec(taskDto.workflowId)
         checkPermission(workflow)
+        checkTimeDeadline(taskDto)
+        checkMaxRetries(taskDto)
         validateScript(taskDto)
         validateCron(taskDto)
+    }
+
+    private fun checkTimeDeadline(taskDto: TaskDto) {
+        taskDto.timeDeadline?.let {
+            if (it <= 0) {
+                throw TaskValidationException("Task time deadline should be above zero")
+            }
+        }
+    }
+
+    private fun checkMaxRetries(taskDto: TaskDto) {
+        if (taskDto.maxRetries < 0) {
+            throw TaskValidationException("Task max retries cannot be negative")
+        }
     }
 
     private fun checkPermission(workflow: Workflow) {

@@ -33,6 +33,7 @@ class SaveLogAndDataFromLogReaderUseCaseImpl(
     override fun exec(workload: Workload, reader: Reader) {
         log.debug("Saving log and data for $workload")
 
+        // todo: workload saveScript & saveLog
         val hasData = workload.task.saveScript
         val saveLog = workload.task.saveLog
 

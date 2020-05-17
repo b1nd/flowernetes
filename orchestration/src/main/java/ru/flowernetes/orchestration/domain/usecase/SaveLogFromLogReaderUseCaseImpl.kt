@@ -17,12 +17,17 @@ class SaveLogFromLogReaderUseCaseImpl(
 ) : SaveLogFromLogReaderUseCase {
 
     override fun exec(workload: Workload, reader: Reader) {
-        val inputStream = ReaderInputStream(reader, Charsets.UTF_8)
-        val logFileDto = FileDto(
-          logFileNameProvider.get(workload),
-          MediaType.TEXT_PLAIN_VALUE,
-          inputStream
-        )
-        addWorkloadLogUseCase.exec(workload, logFileDto)
+        // todo: workload saveScript & saveLog
+        if (workload.task.saveLog) {
+            val inputStream = ReaderInputStream(reader, Charsets.UTF_8)
+            val logFileDto = FileDto(
+              logFileNameProvider.get(workload),
+              MediaType.TEXT_PLAIN_VALUE,
+              inputStream
+            )
+            addWorkloadLogUseCase.exec(workload, logFileDto)
+        } else {
+            reader.close()
+        }
     }
 }

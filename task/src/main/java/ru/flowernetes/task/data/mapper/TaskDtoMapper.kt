@@ -23,6 +23,8 @@ class TaskDtoMapper(
           conditionsJson = objectMapper.writeValueAsString(it.conditions),
           scheduled = it.scheduled,
           baseImage = it.baseImage,
+          timeDeadline = it.timeDeadline,
+          maxRetries = it.maxRetries,
           cpuRequest = cpuQuantityParser.parse(it.cpuRequest),
           memoryRequest = memoryQuantityParser.parse(it.memoryRequest),
           cpuLimit = cpuQuantityParser.parse(it.cpuLimit),

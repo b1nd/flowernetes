@@ -8,5 +8,6 @@ enum class TaskStatus {
     SUCCESS,
     ERROR,
     KILLED,
-    QUOTA_EXCEEDED
+    QUOTA_EXCEEDED,
+    TIME_EXCEEDED
 }

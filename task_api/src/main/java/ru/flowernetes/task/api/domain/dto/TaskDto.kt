@@ -8,6 +8,8 @@ data class TaskDto(
   val conditions: Conditions,
   val scheduled: Boolean,
   val baseImage: String,
+  val timeDeadline: Long?,
+  val maxRetries: Int = 0,
   val memoryRequest: String,
   val memoryLimit: String,
   val cpuRequest: String,

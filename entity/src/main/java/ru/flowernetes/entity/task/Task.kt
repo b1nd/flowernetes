@@ -15,6 +15,8 @@ data class Task(
   val conditionsJson: String,
   val scheduled: Boolean,
   val baseImage: String,
+  val timeDeadline: Long?,
+  val maxRetries: Int,
   val memoryRequest: Long,
   val memoryLimit: Long,
   val cpuRequest: Double,
