@@ -8,16 +8,20 @@ import ru.flowernetes.entity.script.SourceScript
 import ru.flowernetes.script.api.domain.dto.SourceScriptDto
 import ru.flowernetes.script.api.domain.entity.ScriptMetadataKeys
 import ru.flowernetes.script.api.domain.usecase.AddSourceScriptUseCase
+import ru.flowernetes.script.api.domain.usecase.ValidateSourceScriptUseCase
 import ru.flowernetes.team.api.domain.usecase.GetCallingUserTeamUseCase
 import java.time.LocalDateTime
 
 @Component
 class AddSourceScriptUseCaseImpl(
+  private val validateSourceScriptUseCase: ValidateSourceScriptUseCase,
   private val gridFsTemplate: GridFsTemplate,
   private val getCallingUserTeamUseCase: GetCallingUserTeamUseCase
 ) : AddSourceScriptUseCase {
 
     override fun exec(sourceScriptDto: SourceScriptDto, fileDto: FileDto): SourceScript {
+        validateSourceScriptUseCase.exec(sourceScriptDto)
+
         val callingTeamId = getCallingUserTeamUseCase.exec().id
         val metadata = BasicDBObject(mapOf(
           ScriptMetadataKeys.NAME.name to sourceScriptDto.name,

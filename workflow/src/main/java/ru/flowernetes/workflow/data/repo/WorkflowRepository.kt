@@ -7,4 +7,5 @@ import ru.flowernetes.entity.workflow.Workflow
 interface WorkflowRepository : JpaRepository<Workflow, Long> {
     fun findAllByTeam(team: Team): List<Workflow>
     fun findAllByIsPublicIsTrueOrTeam(team: Team): List<Workflow>
+    fun findByName(name: String): Workflow?
 }

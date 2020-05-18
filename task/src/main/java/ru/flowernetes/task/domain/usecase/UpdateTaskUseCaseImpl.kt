@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component
 import ru.flowernetes.entity.task.Task
 import ru.flowernetes.monitoring.api.domain.usecase.GetTaskStatusInfoUseCase
 import ru.flowernetes.monitoring.api.domain.usecase.SendWorkflowTaskStatusMessageUseCase
+import ru.flowernetes.scheduling.api.domain.usecase.RemoveTaskScheduleUseCase
 import ru.flowernetes.scheduling.api.domain.usecase.ScheduleTaskUseCase
 import ru.flowernetes.task.api.domain.dto.TaskDto
 import ru.flowernetes.task.api.domain.usecase.*
@@ -21,6 +22,7 @@ class UpdateTaskUseCaseImpl(
   private val sendWorkflowTaskStatusMessageUseCase: SendWorkflowTaskStatusMessageUseCase,
   private val checkTaskDependenciesHasNoCyclesUseCase: CheckTaskDependenciesHasNoCyclesUseCase,
   private val scheduleTaskUseCase: ScheduleTaskUseCase,
+  private val removeTaskScheduleUseCase: RemoveTaskScheduleUseCase,
   private val taskDtoMapper: TaskDtoMapper
 ) : UpdateTaskUseCase {
 
@@ -35,7 +37,11 @@ class UpdateTaskUseCaseImpl(
         val task = taskRepository.save(mappedTask)
         updateTaskDependenciesFromLogicConditionUseCase.exec(task, taskDto.conditions.logicCondition)
 
-        if (task.scheduled) scheduleTaskUseCase.exec(task)
+        if (task.scheduled) {
+            scheduleTaskUseCase.exec(task)
+        } else {
+            removeTaskScheduleUseCase.exec(task)
+        }
 
         val taskStatusInfo = getTaskStatusInfoUseCase.exec(task)
         sendWorkflowTaskStatusMessageUseCase.exec(task.workflow, taskStatusInfo)
