@@ -7,6 +7,7 @@ import io.fabric8.kubernetes.client.Watcher
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import ru.flowernetes.orchestration.api.domain.entity.JobLabelKeys
 
 @Service
 class JobWatcherService(
@@ -20,7 +21,7 @@ class JobWatcherService(
     }
 
     private fun runWatcher() {
-        kubernetesClient.batch().jobs().watch(object : Watcher<Job> {
+        kubernetesClient.batch().jobs().withLabel(JobLabelKeys.WORKLOAD_ID.name).watch(object : Watcher<Job> {
             override fun onClose(cause: KubernetesClientException) {
                 log.error("Cannot connect to kubernetes, reconnecting in 10 seconds...", cause)
                 Thread.sleep(10000)

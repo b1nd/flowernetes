@@ -40,10 +40,10 @@ open class RunTaskUseCaseImpl(
     @Async
     override fun execAsync(task: Task) {
         log.info("Running $task")
+
         val jobName = taskJobNameProvider.get(task)
         val namespace = task.workflow.team.namespace
         val workload = addNewWorkload(task)
-        val image = getTaskImageOrCreateUseCase.exec(task)
 
         kotlin.runCatching {
             checkTaskNotExceedResourceQuotaUseCase.exec(task)
@@ -59,6 +59,8 @@ open class RunTaskUseCaseImpl(
             updateWorkloadOnError(workload, TaskStatus.KILLED)
             return@execAsync
         }
+
+        val image = getTaskImageOrCreateUseCase.exec(task)
 
         val job = JobBuilder()
           .withApiVersion("batch/$kubernetesApiVersion")
