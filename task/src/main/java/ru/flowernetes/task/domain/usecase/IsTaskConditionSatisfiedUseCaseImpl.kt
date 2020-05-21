@@ -15,9 +15,10 @@ class IsTaskConditionSatisfiedUseCaseImpl(
     override fun exec(task: Task): Boolean {
         val conditions = objectMapper.readValue(task.conditionsJson, Conditions::class.java)
 
-        val logicCondition = conditions.logicCondition?.let {
+        val logicCondition = conditions.logicCondition?.let { logicCondition ->
             val dependencyMarkers = dependencyMarkerRepository.findAllByTask(task)
-            isLogicConditionSatisfied(it, dependencyMarkers)
+              .associateBy { it.dependencyTask.id }
+            isLogicConditionSatisfied(logicCondition, dependencyMarkers)
         }
 
         return logicCondition ?: false
@@ -25,10 +26,9 @@ class IsTaskConditionSatisfiedUseCaseImpl(
 
     private fun isLogicConditionSatisfied(
       logicCondition: LogicCondition,
-      dependencyMarkers: List<DependencyMarker>
+      dependencyMarkers: Map<Long, DependencyMarker>
     ): Boolean = when (logicCondition) {
-        is TaskCondition -> dependencyMarkers
-          .find { it.dependencyTask.id == logicCondition.taskId }?.marker ?: false
+        is TaskCondition -> dependencyMarkers[logicCondition.taskId]?.marker ?: false
         is AndCondition -> logicCondition.logicConditions
           .map { isLogicConditionSatisfied(it, dependencyMarkers) }
           .fold(true, { acc, next -> acc && next })
