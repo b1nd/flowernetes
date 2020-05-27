@@ -27,10 +27,10 @@ class GetWorkloadsUseCaseImpl(
         return workloadRepository.findAll(specification, pageRequest.toSpringPageRequest()).toPage()
     }
 
-    private fun addRoleRestrictionsToFilter(workloadFilter: WorkloadFilter): Specification<Workload> {
+    private fun addRoleRestrictionsToFilter(workloadFilter: WorkloadFilter): Specification<Workload>? {
         return when (getCallingUserSystemRoleUseCase.execute().role) {
-            SystemUserRole.ADMIN -> workloadFilter.copy(team = null).toSpecification()
-            SystemUserRole.TEAM -> workloadFilter.copy(team = getCallingUserTeamUseCase.exec()).toSpecification()
+            SystemUserRole.ADMIN -> workloadFilter.copy(teamId = null).toSpecification()
+            SystemUserRole.TEAM -> workloadFilter.copy(teamId = getCallingUserTeamUseCase.exec().id).toSpecification()
         }
     }
 }

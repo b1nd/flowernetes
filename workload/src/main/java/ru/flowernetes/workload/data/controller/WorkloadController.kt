@@ -9,6 +9,7 @@ import ru.flowernetes.pagination.api.domain.entity.Page
 import ru.flowernetes.pagination.api.domain.entity.PageRequest
 import ru.flowernetes.util.extensions.zip
 import ru.flowernetes.util.file.toResponseEntity
+import ru.flowernetes.workload.api.domain.dto.WorkloadFilter
 import ru.flowernetes.workload.api.domain.usecase.GetWorkloadLogFileDtoByWorkloadIdUseCase
 import ru.flowernetes.workload.api.domain.usecase.GetWorkloadOutputFileDtoByWorkloadIdUseCase
 import ru.flowernetes.workload.api.domain.usecase.GetWorkloadsUseCase
@@ -29,6 +30,17 @@ class WorkloadController(
       @RequestParam(defaultValue = "DESCENDING") direction: Array<Direction>
     ): Page<Workload> {
         return getWorkloadsUseCase.exec(PageRequest(page, size, zip(property, direction)))
+    }
+
+    @PostMapping
+    fun getFilteredWorkloadsPage(
+      @RequestParam page: Int,
+      @RequestParam size: Int,
+      @RequestParam(defaultValue = "workloadCreationTime") property: Array<String>,
+      @RequestParam(defaultValue = "DESCENDING") direction: Array<Direction>,
+      @RequestBody workloadFilter: WorkloadFilter
+    ): Page<Workload> {
+        return getWorkloadsUseCase.exec(PageRequest(page, size, zip(property, direction)), workloadFilter)
     }
 
     @GetMapping("/{id}/log")
