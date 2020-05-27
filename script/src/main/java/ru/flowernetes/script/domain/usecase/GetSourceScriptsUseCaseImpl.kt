@@ -10,6 +10,7 @@ import ru.flowernetes.entity.auth.SystemUserRole
 import ru.flowernetes.entity.script.SourceScript
 import ru.flowernetes.pagination.api.domain.entity.Page
 import ru.flowernetes.pagination.api.domain.entity.PageRequest
+import ru.flowernetes.script.api.domain.dto.SourceScriptFilter
 import ru.flowernetes.script.api.domain.entity.ScriptMetadataKeys
 import ru.flowernetes.script.api.domain.usecase.GetSourceScriptsUseCase
 import ru.flowernetes.script.data.mapper.GridFSFileToSourceScriptMapper
@@ -26,7 +27,7 @@ class GetSourceScriptsUseCaseImpl(
   private val getCallingUserTeamUseCase: GetCallingUserTeamUseCase
 ) : GetSourceScriptsUseCase {
 
-    override fun exec(pageRequest: PageRequest): Page<SourceScript> {
+    override fun exec(pageRequest: PageRequest, sourceScriptFilter: SourceScriptFilter?): Page<SourceScript> {
         val pageable = pageRequest.copy(
           sort = pageRequest.sort.copy(
             orders = pageRequest.sort.orders.map {
@@ -43,7 +44,7 @@ class GetSourceScriptsUseCaseImpl(
             })).toSpringPageRequest()
         val sourceCriteria = Criteria.where(ScriptMetadataKeys.SOURCE.key).exists(true)
 
-        val criteria = when (getCallingUserSystemRoleUseCase.execute().role) {
+        val userCriteria = when (getCallingUserSystemRoleUseCase.execute().role) {
             SystemUserRole.TEAM -> {
                 val callingTeamId = getCallingUserTeamUseCase.exec().id
                 sourceCriteria.orOperator(
@@ -53,6 +54,7 @@ class GetSourceScriptsUseCaseImpl(
             }
             SystemUserRole.ADMIN -> sourceCriteria
         }
+        val criteria = userCriteria.addFilter(sourceScriptFilter)
 
         val files = gridFsTemplate.find(Query(criteria).with(pageable))
         val itemsCount = files.count().toLong()
@@ -67,5 +69,23 @@ class GetSourceScriptsUseCaseImpl(
           pageable,
           itemsCount
         ).toPage()
+    }
+
+    private fun Criteria.addFilter(sourceScriptFilter: SourceScriptFilter?): Criteria {
+        sourceScriptFilter ?: return this
+        val idCriteria = sourceScriptFilter.id?.let {
+            Criteria.where("_id").`is`(it)
+        }
+        val nameCriteria = sourceScriptFilter.name?.let {
+            Criteria.where(ScriptMetadataKeys.NAME.key).regex(".*$it.*")
+        }
+        val tagCriteria = sourceScriptFilter.tag?.let {
+            Criteria.where(ScriptMetadataKeys.TAG.key).regex(".*$it.*")
+        }
+        val filterCriteria = listOfNotNull(idCriteria, nameCriteria, tagCriteria)
+
+        if (filterCriteria.isEmpty()) return this
+
+        return andOperator(*filterCriteria.toTypedArray())
     }
 }

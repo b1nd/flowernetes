@@ -59,9 +59,13 @@ open class RunTaskUseCaseImpl(
             updateWorkloadOnError(workload, TaskStatus.KILLED)
             return@execAsync
         }
-
-        val image = getTaskImageOrCreateUseCase.exec(task)
-
+        val image = kotlin.runCatching {
+            getTaskImageOrCreateUseCase.exec(task)
+        }.getOrElse {
+            logError(it)
+            updateWorkloadOnError(workload, TaskStatus.KILLED)
+            return@execAsync
+        }
         val job = JobBuilder()
           .withApiVersion("batch/$kubernetesApiVersion")
           .withNewMetadata()

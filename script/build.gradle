@@ -5,6 +5,7 @@ dependencies {
     implementation library.util
     implementation library.script_api
     implementation library.team_api
+    implementation library.task_api
     implementation library.auth_api
     implementation library.pagination_api
 

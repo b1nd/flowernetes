@@ -10,6 +10,7 @@ import ru.flowernetes.pagination.api.domain.entity.Direction
 import ru.flowernetes.pagination.api.domain.entity.Page
 import ru.flowernetes.pagination.api.domain.entity.PageRequest
 import ru.flowernetes.script.api.domain.dto.SourceScriptDto
+import ru.flowernetes.script.api.domain.dto.SourceScriptFilter
 import ru.flowernetes.script.api.domain.usecase.*
 import ru.flowernetes.util.extensions.zip
 import ru.flowernetes.util.file.toResponseEntity
@@ -50,6 +51,17 @@ class SourceScriptController(
       @RequestParam(defaultValue = "DESCENDING") direction: Array<Direction>
     ): Page<SourceScript> {
         return getSourceScriptsUseCase.exec(PageRequest(page, size, zip(property, direction)))
+    }
+
+    @PostMapping
+    fun getSourceScriptsPage(
+      @RequestParam page: Int,
+      @RequestParam size: Int,
+      @RequestParam(defaultValue = "uploadDate") property: Array<String>,
+      @RequestParam(defaultValue = "DESCENDING") direction: Array<Direction>,
+      @RequestBody sourceScriptFilter: SourceScriptFilter
+    ): Page<SourceScript> {
+        return getSourceScriptsUseCase.exec(PageRequest(page, size, zip(property, direction)), sourceScriptFilter)
     }
 
     @GetMapping("/{id}")
