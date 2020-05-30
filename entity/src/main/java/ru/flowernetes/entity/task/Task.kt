@@ -24,4 +24,8 @@ data class Task(
   val saveLog: Boolean,
   val saveScript: Boolean,
   val sourceScriptId: String
-)
+) {
+    fun workflowWithName(): String {
+        return "${workflow.name}/$name"
+    }
+}

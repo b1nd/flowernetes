@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component
 import ru.flowernetes.entity.workflow.Workflow
 import ru.flowernetes.workflow.api.domain.usecase.GetWorkflowByIdUseCase
 import ru.flowernetes.workflow.data.repo.WorkflowRepository
-import ru.flowernetes.workflow.domain.entity.NoSuchWorkflowException
+import ru.flowernetes.workflow.api.domain.entity.NoSuchWorkflowException
 
 @Component
 class GetWorkflowByIdUseCaseImpl(

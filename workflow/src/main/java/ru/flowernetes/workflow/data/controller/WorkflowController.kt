@@ -19,6 +19,8 @@ import java.time.LocalDate
 @RequestMapping("/workflows")
 class WorkflowController(
   private val addWorkflowUseCase: AddWorkflowUseCase,
+  private val updateWorkflowUseCase: UpdateWorkflowUseCase,
+  private val deleteWorkflowUseCase: DeleteWorkflowUseCase,
   private val getSessionWorkflowsUseCase: GetSessionWorkflowsUseCase,
   private val getAllWorkflowsUseCase: GetAllWorkflowsUseCase,
   private val getWorkflowByIdUseCase: GetWorkflowByIdUseCase,
@@ -44,6 +46,16 @@ class WorkflowController(
     @GetMapping("/session")
     fun getSessionWorkflows(): AllWorkflowsDto {
         return AllWorkflowsDto(getSessionWorkflowsUseCase.exec())
+    }
+
+    @PatchMapping("/{id}")
+    fun updateWorkflow(@PathVariable id: Long, @RequestBody workflowDto: WorkflowDto): Workflow {
+        return updateWorkflowUseCase.exec(id, workflowDto)
+    }
+
+    @DeleteMapping("/{id}")
+    fun deleteWorkflow(@PathVariable id: Long) {
+        deleteWorkflowUseCase.exec(id)
     }
 
     @GetMapping("/{id}/tasks")

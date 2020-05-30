@@ -2,7 +2,7 @@ package ru.flowernetes.task.domain.usecase
 
 import org.springframework.stereotype.Component
 import ru.flowernetes.entity.task.Task
-import ru.flowernetes.task.api.domain.entity.CannotDeleteDependentTask
+import ru.flowernetes.task.api.domain.entity.CannotDeleteDependentTaskException
 import ru.flowernetes.task.api.domain.usecase.CheckThereAreNoDependenciesOnTaskUseCase
 import ru.flowernetes.task.data.repo.DependencyMarkerRepository
 
@@ -15,7 +15,7 @@ class CheckThereAreNoDependenciesOnTaskUseCaseImpl(
         val dependentMarkers = dependencyMarkerRepository.findAllByDependencyTask(task)
 
         if (dependentMarkers.isNotEmpty()) {
-            throw CannotDeleteDependentTask(task, dependentMarkers.map { it.task })
+            throw CannotDeleteDependentTaskException(task, dependentMarkers.map { it.task })
         }
     }
 }
