@@ -17,14 +17,18 @@ object ZipUtil {
         var zipEntry = zis.nextEntry
 
         while (zipEntry != null) {
-            val newFile = newFile(destDir, zipEntry)
-            val fos = FileOutputStream(newFile)
-            var len: Int
+            if (!zipEntry.isDirectory) {
+                val newFile = newFile(destDir, zipEntry)
+                newFile.parentFile.mkdirs()
+                val fos = FileOutputStream(newFile)
+                var len: Int
 
-            while (zis.read(buffer).also { len = it } > 0) {
-                fos.write(buffer, 0, len)
+                while (zis.read(buffer).also { len = it } > 0) {
+                    fos.write(buffer, 0, len)
+                }
+                fos.close()
             }
-            fos.close()
+            zis.closeEntry()
             zipEntry = zis.nextEntry
         }
         zis.closeEntry()
